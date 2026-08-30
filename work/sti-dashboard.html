@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global STI Trends Dashboard</title>
+<meta name="description" content="Six linked D3 visualisations over 67,438 records covering 200 countries from 1990 to 2024, built without a charting library.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script src="../assets/js/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="topbar__name" href="../">Yaser E. H. Abulaban</a>
+  <nav>
+    <a href="../#work">Work</a>
+    <a href="../#index" class="opt">All projects</a>
+    <a href="../#experience" class="opt">Experience</a>
+    <a href="../#contact">Contact</a>
+    <button class="themetoggle" type="button">Auto</button>
+  </nav>
+</header>
+
+<main id="main">
+
+<section class="cs__head">
+  <div class="wrap wrap--case">
+    <a class="back" href="../#work">&larr; Selected work</a>
+    <span class="eyebrow">Data visualisation · group of 3</span>
+    <h1 class="cs__title">Global STI Trends: six linked views, no chart library</h1>
+    <p class="lede cs__lede">Thirty-five years of HIV, gonorrhoea and syphilis burden across 200 countries, framed against UN Sustainable Development Goal 3 — and one preprocessing decision that stops the whole thing from lying.</p>
+    <dl class="cs__meta">
+      <div><dt>Role</dt><dd>Group of 3 — I built the multi-line time series, the animated bubble chart and the dashboard integration</dd></div>
+      <div><dt>Data</dt><dd>67,438 records · 31 attributes · 200 countries · 1990–2024</dd></div>
+      <div><dt>Stack</dt><dd>D3.js v7, ES modules, vanilla JS, GeoJSON, Python preprocessing</dd></div>
+      <div><dt>Code</dt><dd><a href="https://github.com/Yaserabulaban/sti-trends-dashboard" rel="noopener">github.com/Yaserabulaban/sti-trends-dashboard</a></dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="wrap wrap--case" style="padding-bottom:4rem;">
+  <div class="prose">
+
+    <figure class="fig">
+      <img src="../assets/img/sti-dashboard.png" width="1500" height="1313"
+           alt="The full dashboard: title, filter row with seven controls, six KPI cards, a narrative summary panel and a world choropleth map.">
+      <figcaption>The dashboard. Seven filters at the top, six KPI cards, a generated summary sentence, then the chart stack.</figcaption>
+    </figure>
+
+    <nav class="toc" aria-label="On this page">
+      <span class="eyebrow">On this page</span>
+      <ol>
+        <li><a href="#questions">Four questions, not six charts</a></li>
+        <li><a href="#bubble">The animated bubble chart</a></li>
+        <li><a href="#linking">Cross-filtering</a></li>
+        <li><a href="#build">Build</a></li>
+        <li><a href="#limits">Limitations</a></li>
+      </ol>
+    </nav>
+
+    <div class="abbr">
+      <span class="eyebrow">Terms used on this page</span>
+      <table>
+        <thead><tr><th scope="col">Term</th><th scope="col">Stands for</th><th scope="col">What it is</th></tr></thead>
+        <tbody>
+          <tr><td>STI</td><td>Sexually Transmitted Infection</td><td>The disease group the dashboard covers — HIV, gonorrhoea and syphilis</td></tr>
+          <tr><td>SDG 3</td><td>Sustainable Development Goal 3</td><td>The United Nations goal on good health and well-being, which the dashboard is framed against</td></tr>
+          <tr><td>WHO</td><td>World Health Organization</td><td>Source of the regional groupings used as a filter</td></tr>
+          <tr><td>D3</td><td>Data-Driven Documents</td><td>A JavaScript library for binding data to SVG. It draws nothing for you — every axis and shape is hand-built</td></tr>
+          <tr><td>Choropleth</td><td>—</td><td>A map where each country is shaded by its value</td></tr>
+          <tr><td>GeoJSON</td><td>—</td><td>The open format holding the country outlines the map is drawn from</td></tr>
+          <tr><td>Cross-filtering</td><td>—</td><td>Selecting in one chart filters all the others, because they share one state object</td></tr>
+          <tr><td>Normalised burden score</td><td>—</td><td>Each value scored against the maximum within its own disease-and-metric group, so different metrics can sit on one scale</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="questions">Four questions, not six charts</h2>
+    <p>The brief could have been answered with six charts in a grid. Instead each view exists to answer a specific question, and the questions are printed above the charts so a reader knows what they are looking for:</p>
+    <ol>
+      <li>Where is burden concentrated? &rarr; choropleth world map, ranked country bars</li>
+      <li>How has it moved from 1990 to 2024? &rarr; multi-line time series, animated bubble chart</li>
+      <li>Which countries are improving or worsening fastest? &rarr; year-on-year lollipop with a zero line</li>
+      <li>Which disease dominates in the current filter context? &rarr; share donut, KPI cards</li>
+    </ol>
+    <p>All six read from one shared state module, so selecting South Africa on the map filters every other view at once.</p>
+
+    <div class="callout">
+      <span class="eyebrow">The decision that mattered most</span>
+      <p>The source data mixes incompatible metrics — raw death counts, prevalence rates, incidence per 100,000 — in the same value column. Plotting them on a shared scale would produce a map where the colour means whichever metric happens to be selected, and comparisons across metrics would be meaningless. So every value is scored against the maximum <em>within its own disease-and-metric group</em> and capped to 0–1. The dashboard exposes this as an explicit &ldquo;normalised mode&rdquo; label rather than hiding it, because a reader deserves to know they are looking at a relative score and not a body count.</p>
+    </div>
+
+    <figure class="fig fig--stack">
+      <img src="../assets/img/sti-choropleth.png" width="1400" height="565" loading="lazy" alt="Choropleth world map with countries shaded from pale yellow to deep red by normalised burden score.">
+      <img src="../assets/img/sti-timeseries.png" width="1400" height="561" loading="lazy" alt="Multi-line time series chart showing three disease trend lines from 1990 to 2024.">
+      <figcaption>Top: the choropleth world map, shaded by normalised burden score, with scroll-to-zoom, drag-to-pan and click-to-select. Bottom: the multi-line time series tracking all three diseases from 1990 to 2024 — one of the three views I built.</figcaption>
+    </figure>
+
+    <h2 id="bubble">The animated bubble chart</h2>
+    <p>The bubble chart carries the temporal story: play, pause, and a year slider that scrubs 1990 to 2024, with countries as bubbles positioned by two chosen metrics and sized by burden. This is the view most likely to break, because transitions have to survive the user changing the filter mid-playback. Keying the join by country rather than array index is what makes bubbles move rather than pop, and what stops a filter change from reshuffling identities.</p>
+
+    <figure class="fig">
+      <img src="../assets/img/sti-bubble.png" width="1400" height="572" loading="lazy" alt="Animated bubble chart with country bubbles positioned by two metrics, with play controls and a year slider.">
+      <figcaption>The animated bubble chart with its playback controls.</figcaption>
+    </figure>
+
+    <h2 id="linking">Cross-filtering</h2>
+    <p>Clicking a country anywhere propagates everywhere — the map highlights it, the ranked bars scroll to it, the time series isolates its trend, the KPI cards recompute, and the summary sentence rewrites itself. Linked selection is the single feature that turns six charts into one instrument.</p>
+
+    <figure class="fig">
+      <img src="../assets/img/sti-linked.jpg" width="1300" height="1138" loading="lazy" alt="The dashboard with South Africa selected, showing every view filtered to that country simultaneously.">
+      <figcaption>South Africa selected. Every view updates from the same state object.</figcaption>
+    </figure>
+
+    <h2 id="build">Build</h2>
+    <p>2,351 lines total: 12 JavaScript ES modules (1,003 lines), 581 lines of hand-written CSS, a 196-line HTML shell, and a 273-line Python preprocessing script that produces the cleaned CSV plus two generated metadata files — a metric catalogue and a data dictionary — so the charts can discover what is available rather than hard-coding metric names.</p>
+    <p>No React, no charting library, no build step. D3 v7 from a CDN, native ES modules, and <code>python -m http.server</code> to serve it. For a visualisation assignment that constraint is the point: everything on screen is a decision somebody made rather than a component default.</p>
+
+    <h2 id="limits">Limitations</h2>
+    <ul>
+      <li>Normalised scores are relative within a metric group, so they support &ldquo;which is higher&rdquo; but not &ldquo;how many people&rdquo;. That is a real loss of information, taken deliberately in exchange for comparability.</li>
+      <li>Country coverage is uneven across the 35 years; sparse early records make pre-2000 trends less reliable than the chart's smooth lines imply.</li>
+      <li>No accessibility pass on the colour scales — a sequential yellow-to-red ramp is not colourblind-safe and would need replacing before this went in front of a real audience.</li>
+    </ul>
+
+    <div class="nextprev">
+      <a href="fifa-sentiment.html">&larr; 20,050 Steam reviews</a>
+      <a href="cartly.html">Next: Cartly &rarr;</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <ul class="contactlist">
+        <li><a href="mailto:yaserabulaban@gmail.com">yaserabulaban@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/yaser-abulaban-82b199236/" rel="noopener">linkedin.com/in/yaser-abulaban</a></li>
+        <li><a href="https://github.com/Yaserabulaban" rel="noopener">github.com/Yaserabulaban</a></li>
+      </ul>
+    </div>
+    <p class="foot__fine">Screenshots from the project's own documentation folder.</p>
+  </div>
+</footer>
+
+</body>
+</html>

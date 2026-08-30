@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ParkViewRT — Vision-Based Parking Occupancy</title>
+<meta name="description" content="Final year project: YOLO vehicle detection mapped onto 197 hand-labelled parking-slot polygons, benchmarked against 2,167 manually verified labels.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script src="../assets/js/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="topbar__name" href="../">Yaser E. H. Abulaban</a>
+  <nav>
+    <a href="../#work">Work</a>
+    <a href="../#index" class="opt">All projects</a>
+    <a href="../#experience" class="opt">Experience</a>
+    <a href="../#contact">Contact</a>
+    <button class="themetoggle" type="button">Auto</button>
+  </nav>
+</header>
+
+<main id="main">
+
+<section class="cs__head">
+  <div class="wrap wrap--case">
+    <a class="back" href="../#work">&larr; Selected work</a>
+    <span class="eyebrow">Final year project · solo</span>
+    <h1 class="cs__title">ParkViewRT: vision-based parking slot monitoring</h1>
+    <p class="lede cs__lede">One camera view can cover dozens of parking slots. A sensor covers one. This project takes the camera route seriously — and then spends most of its effort proving the result is trustworthy rather than just plausible.</p>
+    <dl class="cs__meta">
+      <div><dt>Role</dt><dd>Solo — research, labelling, backend, frontend, evaluation. Supervised final year project; all work and writing my own</dd></div>
+      <div><dt>Timeline</dt><dd>Nov 2025 – Jul 2026 (two trimesters)</dd></div>
+      <div><dt>Stack</dt><dd>Python, FastAPI, Ultralytics YOLO11, Shapely, OpenCV, React 18, TypeScript, Vite, Tailwind</dd></div>
+      <div><dt>Code</dt><dd><a href="https://github.com/Yaserabulaban/parkviewrt" rel="noopener">github.com/Yaserabulaban/parkviewrt</a></dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="wrap wrap--case" style="padding-bottom:4rem;">
+  <div class="prose">
+
+    <nav class="toc" aria-label="On this page">
+      <span class="eyebrow">On this page</span>
+      <ol>
+        <li><a href="#problem">The problem worth solving</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#naive">The problem the naive version has</a></li>
+        <li><a href="#states">Three states, not two</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#evaluation">Evaluation</a></li>
+        <li><a href="#models">Four models, identical conditions</a></li>
+        <li><a href="#thresholds">210 threshold combinations</a></li>
+        <li><a href="#limitations">Honest limitations</a></li>
+        <li><a href="#next">What I would do next</a></li>
+        <li><a href="#delivery">Verification and delivery</a></li>
+      </ol>
+    </nav>
+
+    <div class="abbr">
+      <span class="eyebrow">Terms used on this page</span>
+      <table>
+        <thead><tr><th scope="col">Term</th><th scope="col">Stands for</th><th scope="col">What it is</th></tr></thead>
+        <tbody>
+          <tr><td>FCI</td><td>Faculty of Computing and Informatics</td><td>One of the two Multimedia University car parks monitored — the busy one, 78 slots</td></tr>
+          <tr><td>FAIE</td><td>Faculty of Artificial Intelligence and Engineering</td><td>The second car park, a U-shaped layout, 24 slots by day and 18 at night</td></tr>
+          <tr><td>MMU</td><td>Multimedia University</td><td>The campus in Cyberjaya, Malaysia where the footage and survey were collected</td></tr>
+          <tr><td>YOLO</td><td>You Only Look Once</td><td>A family of single-pass object detectors. The <em>n</em> suffix (yolo11n) marks the smallest, fastest variant</td></tr>
+          <tr><td>FYP</td><td>Final Year Project</td><td>The two-trimester capstone this work was submitted for</td></tr>
+          <tr><td>False available</td><td>—</td><td>The system reporting a slot as free when a car is in it. The error that actually costs a driver something</td></tr>
+          <tr><td>Occluded</td><td>—</td><td>A monitored slot the camera cannot resolve — tree cover, glare, a blocking vehicle. Reported as its own state rather than guessed</td></tr>
+          <tr><td>Unmonitored</td><td>—</td><td>A slot drawn in the layout but outside the camera's usable view, so never given a status</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="fig">
+      <img src="../assets/img/parkviewrt-detect-day.jpg" width="1600" height="900"
+           alt="Aerial parking frame with 78 slot polygons and 99 detected vehicle bounding boxes, colour-coded by occupancy, plus a summary bar across the top.">
+      <figcaption>The debug overlay endpoint. Red polygons are occupied slots, green available, amber occluded; blue boxes are YOLO vehicle detections with confidence scores. The header strip is the system's own summary for this frame.</figcaption>
+    </figure>
+
+    <h2 id="problem">The problem worth solving</h2>
+    <p>Nobody knows whether a campus car park has space until they are already inside it, circling. The standard fix — a sensor in every slot — means installing and maintaining hardware per parking space. A camera sees an entire row at once and needs no change to the ground.</p>
+    <p>I did not want to take that premise on faith, so the first trimester was spent establishing it. A survey of 88 respondents at Multimedia University put the two most common complaints as difficulty finding an empty space (62 respondents) and time wasted searching (60). Forty-four named the faculty parking area specifically as the worst. Sixty-four strongly agreed that a smart parking system should exist. A separate observation study — three sites, three time windows, fifteen photographs — found the 10&nbsp;a.m.–2&nbsp;p.m. window consistently jammed.</p>
+
+    <figure class="fig fig--stack">
+      <img src="../assets/img/survey-issues.png" width="1200" height="469" loading="lazy" alt="Bar chart of parking issues reported by survey respondents, led by difficulty finding empty spaces and time wasted searching.">
+      <img src="../assets/img/parking-problem-photo.jpg" width="1118" height="839" loading="lazy" alt="Photograph of a full campus car park with every visible slot occupied and cars queuing.">
+      <figcaption>Top: the main parking issues reported across the 88-response survey, analysed in pandas — difficulty finding an empty slot and time wasted searching are the two clear leaders, well ahead of congestion or signage. Bottom: the FCI car park photographed during the midday window of the field observation study, with every visible slot taken.</figcaption>
+    </figure>
+
+    <h2 id="how">How it works</h2>
+    <p>Vehicles are detected by a pretrained Ultralytics YOLO model — no custom training — filtered to the <code>car</code> and <code>truck</code> classes, at 1600&nbsp;px inference size and 0.20 confidence. The interesting half is what happens next: turning &ldquo;there is a car roughly here&rdquo; into &ldquo;slot A47 is occupied&rdquo;.</p>
+    <p>Every monitored slot is a hand-labelled polygon — 197 of them across four video variants (FCI day and night, FAIE day and night). For each detection, Shapely computes two ratios: the intersection over the slot's own area, and the intersection over the detection box's area. A slot counts as occupied if either ratio clears its threshold, or if the detection's centre falls inside the polygon, or the polygon's centroid falls inside the box.</p>
+
+    <figure class="fig">
+      <img src="../assets/img/parkviewrt-overlap.png" width="1400" height="827" loading="lazy" alt="Diagram showing a detection box overlapping a slot polygon, with the two overlap ratios that decide occupancy annotated.">
+      <figcaption>The overlap rules. Two ratios and two containment tests, any one of which is sufficient — which is what makes angled camera views workable.</figcaption>
+    </figure>
+
+    <h3 id="naive">The problem the naive version has</h3>
+    <p>In an angled row, one car overlaps two polygons, so a naive rule marks two slots occupied and the dashboard starts inventing cars. The fix is a ranked greedy assignment: each detection can claim only one slot, and match types are scored from strongest geometric signal to weakest fallback.</p>
+    <ul>
+      <li>Detection centre inside the polygon &rarr; <span class="mono">3 + overlap</span></li>
+      <li>Slot-area overlap above threshold &rarr; <span class="mono">2 + overlap</span></li>
+      <li>Box-area overlap above threshold &rarr; <span class="mono">1 + box overlap</span></li>
+      <li>Polygon centroid inside the detection box &rarr; <span class="mono">0.5 + overlap</span></li>
+    </ul>
+    <p>Highest score wins the detection; everything else has to find its own car.</p>
+
+    <h3 id="states">Three states, not two</h3>
+    <p>Some FCI slots sit under permanent tree cover and the detector genuinely cannot resolve them in daylight. A binary system has to guess, and guessing &ldquo;available&rdquo; there is the worst thing it could do to a driver. So the model has a third state — <em>occluded</em> — plus a fourth, <em>unmonitored</em>, for slots that exist in the layout but fall outside the camera's usable view. The dashboard stays honest about what it can and cannot see.</p>
+
+    <h2 id="architecture">Architecture</h2>
+    <p>A FastAPI service exposes ten endpoints: root, health and config; slot status for a location, plus its demo, video-samples and video-snapshot variants; video streaming and video metadata; and a debug route that returns the annotated JPEG above. The frontend sends the browser's current playback frame index; the backend reads that exact frame from the original source video with OpenCV, runs detection, and returns the per-slot verdict.</p>
+
+    <figure class="fig">
+      <img src="../assets/img/parkviewrt-sequence.png" width="1300" height="1018" loading="lazy" alt="Sequence diagram showing the browser requesting a frame snapshot, the backend reading the video frame, running YOLO detection and Shapely overlap, then returning slot statuses.">
+      <figcaption>Request flow from browser playback position to per-slot status.</figcaption>
+    </figure>
+
+    <p>Two decisions in here that were not obvious to me at the start:</p>
+    <ul>
+      <li><strong>The analysis path and the playback path are separate.</strong> The recordings are HEVC <code>.MOV</code> files that browsers refuse to play. Rather than transcode the source and change the pixels being analysed, a tool generates H.264 copies purely for preview. OpenCV always reads the original.</li>
+      <li><strong>The frame-status cache key includes everything that could change the answer</strong> — location, variant, source video identity, slot file identity, both thresholds, inference size and frame index. Relabel a polygon or move a threshold and the cache misses, as it should. A cache that can serve a stale verdict is worse than no cache.</li>
+    </ul>
+
+    <figure class="fig fig--pair">
+      <img src="../assets/img/parkviewrt-ui-fci-day.jpg" width="1500" height="771" loading="lazy" alt="ParkViewRT dashboard, FCI day: rows of parking slots mostly red with a few green and amber, next to the source footage panel.">
+      <img src="../assets/img/parkviewrt-ui-fci-night.jpg" width="1500" height="771" loading="lazy" alt="ParkViewRT dashboard, FCI night: the same layout with most slots green.">
+      <figcaption>The same car park at midday and at night. The layout is drawn from the real row plan, so a slot's position on screen corresponds to where it is on the ground — row A top-left, the main left and right lines, then the lower rows. At midday almost everything is red; by night almost everything is green, which is the clearest single demonstration that the detection is tracking reality rather than a fixed guess.</figcaption>
+    </figure>
+
+    <figure class="fig fig--pair">
+      <img src="../assets/img/parkviewrt-ui-home.jpg" width="1500" height="771" loading="lazy" alt="ParkViewRT landing page with the MMU logo and two buttons: View FCI Parking and View FAIE Parking.">
+      <img src="../assets/img/parkviewrt-ui-faie.jpg" width="1500" height="771" loading="lazy" alt="ParkViewRT dashboard showing the FAIE parking layout in a U shape, with monitored and unmonitored slots distinguished.">
+      <figcaption>Left: the entry point, where a visitor picks which car park to look at. Right: the FAIE car park — a U-shaped layout where only part of the ground falls inside the camera's usable view. Slots outside that view stay drawn in the layout but are marked unmonitored rather than being given a status the system cannot actually support.</figcaption>
+    </figure>
+
+    <figure class="fig">
+      <img src="../assets/img/parkviewrt-detect-night.jpg" width="1600" height="900" loading="lazy"
+           alt="Night-time parking frame with slot polygons and vehicle detections overlaid, mostly showing available slots.">
+      <figcaption>The FAIE car park at night. Lighting, shadow and tree cover were the main reasons to evaluate day and night variants separately rather than reporting one blended number.</figcaption>
+    </figure>
+
+    <h2 id="evaluation">Evaluation — the part I spent the most time on</h2>
+    <p>It would have been easy to report a number from a handful of frames and move on. Instead I built a scripted, re-runnable evaluation harness — about 2,130 lines across eight scripts — and a ground-truth set I labelled by hand: eleven evenly spaced frames from each of the four video variants, giving <strong>44 frames and 2,167 monitored slot labels</strong>. Every row is marked verified; a <code>verify_ground_truth.py</code> gate rejects preliminary rows by default, and the flag that overrides it is documented as diagnostic-only and not for reported results.</p>
+    <p>The label mix reflects real conditions rather than a balanced set: 1,106 occupied, 1,009 available, 52 occluded. FCI at midday is 92% full; FCI at night is 90% empty.</p>
+
+    <h3 id="models">Four models, identical conditions</h3>
+    <div class="tablewrap" style="margin:1.5rem 0;">
+      <table class="data">
+        <thead>
+          <tr><th scope="col">Model</th><th scope="col" class="n">Correct</th><th scope="col" class="n">Accuracy</th><th scope="col" class="n">False &ldquo;available&rdquo;</th><th scope="col" class="n">Avg pipeline</th></tr>
+        </thead>
+        <tbody>
+          <tr class="win"><td>yolo11n</td><td class="n">2,167 / 2,167</td><td class="n">100.00%</td><td class="n">0</td><td class="n">515.6 ms</td></tr>
+          <tr><td>yolo12n</td><td class="n">2,140</td><td class="n">98.75%</td><td class="n">12</td><td class="n">877.8 ms</td></tr>
+          <tr><td>yolo26n</td><td class="n">2,070</td><td class="n">95.52%</td><td class="n">73</td><td class="n">541.6 ms</td></tr>
+          <tr><td>yolov8n</td><td class="n">2,033</td><td class="n">93.82%</td><td class="n">134 total mismatches, 113 false-available</td><td class="n">601.1 ms</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The newest checkpoint was not the best one. yolo11n was both the most accurate and the fastest, and the two newer models made exactly the error that matters most.</p>
+
+    <div class="callout">
+      <span class="eyebrow">Why one error type matters more</span>
+      <p>Telling a driver an occupied slot is free sends them to a slot that is not there. Telling them a free slot is taken merely costs them an option. These are not symmetric, so I reported false-available separately rather than folding everything into one accuracy figure — and generated annotated examples of each competing model producing that specific failure.</p>
+    </div>
+
+    <figure class="fig">
+      <img src="../assets/img/parkviewrt-false-available.jpg" width="1300" height="853" loading="lazy" alt="Four panels showing YOLOv8n false classifications: three frames where an occupied slot was predicted as available, and one variant with no false classification.">
+      <figcaption>YOLOv8n's false-available cases, one real example per video variant. Generating these was the point at which the model comparison stopped being a table and started being an argument.</figcaption>
+    </figure>
+
+    <h3 id="thresholds">Then 210 threshold combinations</h3>
+    <p>Seven confidence values × six slot-overlap thresholds × five box-overlap thresholds, all scored against the same 2,167 labels. Accuracy peaked sharply at confidence 0.20 — 99.54% at 0.15, 100.00% at 0.20, 99.08% at 0.25 — and <strong>thirty different combinations</strong> reached a perfect score there.</p>
+    <p>The ranking function's top pick was slot 0.40 / box 0.30. I kept the production values of 0.25 / 0.20 instead. When thirty configurations tie on the evaluation set, the tie-break should be which one is least likely to be overfitted to it, and the more permissive thresholds already in use had a wider margin before behaviour changed. The report states the ranking result and the reason for overriding it.</p>
+
+    <div class="callout callout--warn">
+      <span class="eyebrow">What this number does and does not mean</span>
+      <p>100% here means 2,167 out of 2,167 labels correct on 44 frames drawn from four specific recordings, at fixed camera angles I labelled polygons against. It is not a claim about vision-based parking detection in general. Broader claims would need recordings across more days, weather, camera positions and occupancy levels — which the report says explicitly, because a portfolio number that cannot survive a follow-up question is worth nothing.</p>
+    </div>
+
+    <h2 id="limitations">Honest limitations</h2>
+    <ul>
+      <li>Recorded video, not a live camera feed — no accessible stream from the campus car parks existed.</li>
+      <li>A pretrained model, not one I trained or fine-tuned. That was a scope decision, and the write-up says so plainly.</li>
+      <li>No database and no server-side history yet; state lives in slot JSON files plus a frame-status cache.</li>
+      <li>Slot polygons are tied to the camera angle used during labelling. Move the camera and they need redrawing.</li>
+      <li>Local deployment only — no container, no cloud, no CI.</li>
+    </ul>
+
+    <h2 id="next">What I would do next</h2>
+    <p>In order of value: persist frame verdicts so occupancy becomes a time series rather than an instant, which makes forecasting possible; fine-tune on frames from these actual cameras to see whether the occluded slots become resolvable; and replace manual polygon labelling with a semi-automatic pass so a new site does not cost a day of clicking.</p>
+
+    <h2 id="delivery">Verification and delivery</h2>
+    <p>23 pytest tests over the status routes, a passing production build, and per-variant validation of metadata, snapshot and debug-image endpoints for all four videos. Documentation is a 16&nbsp;KB README with a troubleshooting section, six design documents, and a five-step runbook for reproducing the evaluation from scratch. The project was also written up as a ten-section commercialisation proposal with a SWOT analysis.</p>
+
+    <div class="nextprev">
+      <a href="../#work">&larr; All selected work</a>
+      <a href="fifa-sentiment.html">Next: 20,050 Steam reviews &rarr;</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <ul class="contactlist">
+        <li><a href="mailto:yaserabulaban@gmail.com">yaserabulaban@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/yaser-abulaban-82b199236/" rel="noopener">linkedin.com/in/yaser-abulaban</a></li>
+        <li><a href="https://github.com/Yaserabulaban" rel="noopener">github.com/Yaserabulaban</a></li>
+      </ul>
+    </div>
+    <p class="foot__fine">Every number on this page comes from the submitted report, the evaluation CSVs or a test run I can reproduce on request.</p>
+  </div>
+</footer>
+
+</body>
+</html>

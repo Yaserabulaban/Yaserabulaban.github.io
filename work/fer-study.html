@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Does Preprocessing Help FER?</title>
+<meta name="description" content="A controlled ablation study: four data conditions crossed against six model families on FER-2013, testing whether classical image preprocessing improves facial expression recognition.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script src="../assets/js/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="topbar__name" href="../">Yaser E. H. Abulaban</a>
+  <nav>
+    <a href="../#work">Work</a>
+    <a href="../#index" class="opt">All projects</a>
+    <a href="../#experience" class="opt">Experience</a>
+    <a href="../#contact">Contact</a>
+    <button class="themetoggle" type="button">Auto</button>
+  </nav>
+</header>
+
+<main id="main">
+
+<section class="cs__head">
+  <div class="wrap wrap--case">
+    <a class="back" href="../#work">&larr; Selected work</a>
+    <span class="eyebrow">Visual information processing · group of 3</span>
+    <h1 class="cs__title">Does preprocessing help facial expression recognition?</h1>
+    <p class="lede cs__lede">The course taught median filtering, Gaussian smoothing and CLAHE as things you do before classification. We tested whether they actually help. On FER-2013, they do not — and the thing that <em>does</em> help does not show up in accuracy at all.</p>
+    <dl class="cs__meta">
+      <div><dt>Role</dt><dd>Group of 3</dd></div>
+      <div><dt>Data</dt><dd>FER-2013 · 35,887 grayscale 48×48 images · 7 classes · fixed 7,178-image test set</dd></div>
+      <div><dt>Design</dt><dd>4 data conditions × 6 model families ≈ 20 trained artefacts</dd></div>
+      <div><dt>Stack</dt><dd>Ultralytics YOLO11, TensorFlow/Keras, scikit-learn, OpenCV, scikit-image</dd></div>
+      <div><dt>Code</dt><dd><a href="https://github.com/Yaserabulaban/fer-preprocessing-study" rel="noopener">github.com/Yaserabulaban/fer-preprocessing-study</a></dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="wrap wrap--case" style="padding-bottom:4rem;">
+  <div class="prose">
+
+    <nav class="toc" aria-label="On this page">
+      <span class="eyebrow">On this page</span>
+      <ol>
+        <li><a href="#experiment">The experiment</a></li>
+        <li><a href="#result1">Result one: preprocessing hurt</a></li>
+        <li><a href="#classical">The classical ceiling</a></li>
+        <li><a href="#result2">Result two: the hidden improvement</a></li>
+        <li><a href="#scale">Scale and what I would fix</a></li>
+      </ol>
+    </nav>
+
+    <div class="abbr">
+      <span class="eyebrow">Terms used on this page</span>
+      <table>
+        <thead><tr><th scope="col">Term</th><th scope="col">Stands for</th><th scope="col">What it is</th></tr></thead>
+        <tbody>
+          <tr><td>FER</td><td>Facial Expression Recognition</td><td>Classifying a face into an emotion. FER-2013 is the standard benchmark dataset</td></tr>
+          <tr><td>CLAHE</td><td>Contrast Limited Adaptive Histogram Equalisation</td><td>Boosts local contrast in small tiles rather than across the whole image</td></tr>
+          <tr><td>HOG</td><td>Histogram of Oriented Gradients</td><td>A hand-crafted feature describing edge directions in each patch</td></tr>
+          <tr><td>SIFT</td><td>Scale-Invariant Feature Transform</td><td>A hand-crafted keypoint descriptor that survives scaling and rotation</td></tr>
+          <tr><td>Ablation study</td><td>—</td><td>Changing one variable at a time while holding everything else fixed, to find out what actually causes a result</td></tr>
+          <tr><td>Macro-F1</td><td>—</td><td>F1 averaged with equal weight per class, so a rare class like <em>disgust</em> counts as much as <em>happy</em></td></tr>
+          <tr><td>Confusion matrix</td><td>—</td><td>A grid of true class against predicted class. The diagonal is what the model got right</td></tr>
+          <tr><td>Top-1 / Top-5</td><td>—</td><td>Whether the correct answer was the model's first guess, or anywhere in its top five</td></tr>
+          <tr><td>Augmentation</td><td>—</td><td>Generating extra training images by flipping, rotating and shifting the originals</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="experiment">The experiment</h2>
+    <p>The point was not to win on FER-2013 — the state of the art is well past what a coursework project reaches. The point was to isolate one variable. Four data conditions:</p>
+    <ol>
+      <li><strong>Original</strong> — FER-2013 untouched</li>
+      <li><strong>Augmented</strong>, no preprocessing</li>
+      <li><strong>Augmented + preprocessed</strong> — median filter, Gaussian filter, CLAHE</li>
+      <li><strong>Class-balanced augmentation</strong> — augmentation targeted at the under-represented classes</li>
+    </ol>
+    <p>Each crossed against six model families: SVM, logistic regression and random forest on HOG + SIFT features; YOLOv11n-cls; VGG19; ResNet50. The test set stayed identical at 7,178 images throughout, so every number is comparable to every other number.</p>
+
+    <h2 id="result1">Result one: preprocessing hurt</h2>
+
+    <div class="tablewrap" style="margin:1.5rem 0;">
+      <table class="data">
+        <thead><tr><th scope="col">Condition (YOLOv11n-cls)</th><th scope="col" class="n">Accuracy</th><th scope="col" class="n">Macro F1</th></tr></thead>
+        <tbody>
+          <tr class="win"><td>Original — no augmentation, no preprocessing</td><td class="n">0.6542</td><td class="n">0.6036</td></tr>
+          <tr><td>Augmented, no preprocessing</td><td class="n">0.6456</td><td class="n">—</td></tr>
+          <tr><td>Class-balanced augmentation</td><td class="n">0.6457</td><td class="n">0.6223</td></tr>
+          <tr><td>Augmented + preprocessed</td><td class="n">0.5869</td><td class="n">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="eyebrow">Why it hurt</span>
+      <p>FER-2013 images are 48×48 pixels. An expression is carried by fine detail — the crease at a mouth corner, the tightening around an eye. Median and Gaussian filtering are designed to suppress high-frequency information, and at this resolution the high-frequency information <em>is</em> the signal. CLAHE then amplifies local contrast including whatever noise survived. Six and a half points of accuracy went into cleaning up the only evidence the classifier had.</p>
+    </div>
+
+    <p>The deep CNNs told the same story from the other direction, and both landed well below the small YOLO classifier: VGG19 reached 0.58 with augmentation and preprocessing against 0.54 on original data; ResNet50 managed 0.52 and 0.48. Large ImageNet backbones on 48×48 grayscale faces are a poor fit, and the results say so.</p>
+
+    <h3 id="classical">The classical ceiling</h3>
+    <p>HOG + SIFT features with classical classifiers topped out around 0.43–0.48 — best was random forest with class-balanced augmentation at 0.4790 accuracy and 0.4282 macro-F1. Roughly seventeen points below the learned-feature models on identical data, which is a clean demonstration of why hand-crafted descriptors gave way to learned ones for this task.</p>
+
+    <figure class="fig">
+      <img src="../assets/img/fer-training.png" width="1200" height="1200" loading="lazy"
+           alt="Training curves for the YOLO classifier: loss falling and top-1 accuracy rising across 50 epochs for train and validation splits.">
+      <figcaption>YOLOv11n-cls over 50 epochs, ending at 0.6545 top-1 and 0.9893 top-5 on validation. The top-5 figure is worth noting: the model nearly always has the right answer in its shortlist, so the failure is discrimination between similar expressions rather than blindness.</figcaption>
+    </figure>
+
+    <h2 id="result2">Result two: the metric was hiding the improvement</h2>
+    <p>Class-balanced augmentation looks like a wash on accuracy — 0.6457 against a 0.6542 baseline. It is not. Macro-F1 rises from 0.6036 to 0.6223, and the reason is visible in one class.</p>
+
+    <figure class="fig fig--pair">
+      <img src="../assets/img/fer-confusion-base.png" width="1200" height="900" loading="lazy" alt="Normalised confusion matrix for the baseline model, with the disgust row showing very low recall.">
+      <img src="../assets/img/fer-confusion-balanced.png" width="1200" height="900" loading="lazy" alt="Normalised confusion matrix after class-balanced augmentation, with a much stronger disgust diagonal.">
+      <figcaption>Normalised confusion matrices for the baseline model (left) and after class-balanced augmentation (right). Read along the <em>disgust</em> row: recall goes from <strong>0.3063</strong> to <strong>0.7207</strong>, more than doubling, while overall accuracy barely moves. That is the entire argument for reporting macro-F1 alongside accuracy on an imbalanced dataset.</figcaption>
+    </figure>
+
+    <p><em>Disgust</em> is the smallest class in FER-2013 by a wide margin. The baseline model largely gave up on it — 0.4359 F1 — and lost almost nothing in overall accuracy for doing so, because the class is rare. Balanced augmentation more than doubles its recall while overall accuracy stays flat. If you evaluate on accuracy alone, the single most useful change in the whole study is invisible.</p>
+
+    <p>The most confident class throughout is <em>happy</em> at 0.8613 F1, which is unsurprising: it is the best-represented, and a smile is the most visually distinct expression in the set.</p>
+
+    <h2 id="scale">Scale and what I would fix</h2>
+    <p>Seven notebooks, 115 cells, 2,356 lines of notebook code, plus two standalone validation scripts and around twenty trained artefacts with weights retained so results can be re-checked rather than merely believed. Trained on Kaggle and Colab GPUs.</p>
+    <ul>
+      <li><strong>The report was never finished.</strong> The abstract and conclusion sections are empty in the submitted draft. The code and results are complete; the write-up is not, and pretending otherwise here would be the wrong call.</li>
+      <li>Single train/test split, no cross-validation and no confidence intervals — so the smaller gaps (0.6456 vs 0.6457) are noise and should not be read as differences.</li>
+      <li>Preprocessing was tested as one fixed three-step chain. Testing each step in isolation would say <em>which</em> operation does the damage, which is the more useful question and the obvious next experiment.</li>
+      <li>FER-2013's own labels are known to be noisy, which caps what any model can score and is not accounted for here.</li>
+    </ul>
+
+    <div class="nextprev">
+      <a href="fraud-detection.html">&larr; Insurance fraud detection</a>
+      <a href="../#work">All selected work &rarr;</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <ul class="contactlist">
+        <li><a href="mailto:yaserabulaban@gmail.com">yaserabulaban@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/yaser-abulaban-82b199236/" rel="noopener">linkedin.com/in/yaser-abulaban</a></li>
+        <li><a href="https://github.com/Yaserabulaban" rel="noopener">github.com/Yaserabulaban</a></li>
+      </ul>
+    </div>
+    <p class="foot__fine">Confusion matrices and training curves are the training runs' own outputs, retained in the project repository.</p>
+  </div>
+</footer>
+
+</body>
+</html>

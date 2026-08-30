@@ -1,0 +1,9 @@
+# macOS / Windows cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# editors
+.vscode/
+.idea/
+*.swp

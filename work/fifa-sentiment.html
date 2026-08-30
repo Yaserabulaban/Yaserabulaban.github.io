@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>20,050 Steam Reviews</title>
+<meta name="description" content="Opinion mining on FIFA 23 Steam reviews: six models on identical splits, four hypothesis tests, and aspect-based sentiment across six facets of the game.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script src="../assets/js/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="topbar__name" href="../">Yaser E. H. Abulaban</a>
+  <nav>
+    <a href="../#work">Work</a>
+    <a href="../#index" class="opt">All projects</a>
+    <a href="../#experience" class="opt">Experience</a>
+    <a href="../#contact">Contact</a>
+    <button class="themetoggle" type="button">Auto</button>
+  </nav>
+</header>
+
+<main id="main">
+
+<section class="cs__head">
+  <div class="wrap wrap--case">
+    <a class="back" href="../#work">&larr; Selected work</a>
+    <span class="eyebrow">Social media computing · group of 2</span>
+    <h1 class="cs__title">What 20,050 Steam reviews say about FIFA 23</h1>
+    <p class="lede cs__lede">Six models, one test split, and a result that argues against reaching for a transformer by reflex. Then a layer that turns the metrics into something a product team could act on.</p>
+    <dl class="cs__meta">
+      <div><dt>Role</dt><dd>Group of 2</dd></div>
+      <div><dt>Data</dt><dd>25,737 raw reviews &rarr; 20,050 cleaned English reviews, Sep 2022 – Mar 2023</dd></div>
+      <div><dt>Stack</dt><dd>Python, scikit-learn, NLTK/VADER, TensorFlow, HuggingFace Transformers, SciPy</dd></div>
+      <div><dt>Code</dt><dd><a href="https://github.com/Yaserabulaban/fifa23-review-sentiment" rel="noopener">github.com/Yaserabulaban/fifa23-review-sentiment</a></dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="wrap wrap--case" style="padding-bottom:4rem;">
+  <div class="prose">
+
+    <nav class="toc" aria-label="On this page">
+      <span class="eyebrow">On this page</span>
+      <ol>
+        <li><a href="#pipeline">The pipeline</a></li>
+        <li><a href="#finding">The finding that matters</a></li>
+        <li><a href="#labels">Being careful about labels</a></li>
+        <li><a href="#hypotheses">Four hypothesis tests</a></li>
+        <li><a href="#aspects">From metrics to something actionable</a></li>
+        <li><a href="#limits">Scale and limitations</a></li>
+      </ol>
+    </nav>
+
+    <div class="abbr">
+      <span class="eyebrow">Terms used on this page</span>
+      <table>
+        <thead><tr><th scope="col">Term</th><th scope="col">Stands for</th><th scope="col">What it is</th></tr></thead>
+        <tbody>
+          <tr><td>TF-IDF</td><td>Term Frequency – Inverse Document Frequency</td><td>A way of turning text into numbers that weights a word by how distinctive it is to one review rather than common across all of them</td></tr>
+          <tr><td>VADER</td><td>Valence Aware Dictionary and sEntiment Reasoner</td><td>A rule-based sentiment scorer tuned for social media. Its <em>compound</em> score runs from −1 to +1</td></tr>
+          <tr><td>DistilBERT</td><td>—</td><td>A smaller, faster distilled version of BERT. The SST-2 checkpoint was fine-tuned on film reviews</td></tr>
+          <tr><td>SST-2</td><td>Stanford Sentiment Treebank v2</td><td>The film-review dataset that checkpoint was trained on — which is why it transfers poorly to game reviews</td></tr>
+          <tr><td>BiLSTM</td><td>Bidirectional Long Short-Term Memory</td><td>A recurrent neural network that reads a sentence forwards and backwards before deciding</td></tr>
+          <tr><td>F1</td><td>—</td><td>The harmonic mean of precision and recall. One number that punishes a model for being lopsided either way</td></tr>
+          <tr><td>Macro-F1</td><td>—</td><td>F1 averaged over classes with equal weight, so a rare class counts as much as a common one</td></tr>
+          <tr><td>ABSA</td><td>Aspect-Based Sentiment Analysis</td><td>Scoring sentiment per topic — price, servers, graphics — instead of one verdict per review</td></tr>
+          <tr><td><code>voted_up</code></td><td>—</td><td>Steam's own thumbs-up / thumbs-down flag. The only label in this dataset that is not inferred</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="pipeline">The pipeline</h2>
+    <p>Raw Steam reviews in, four separate analyses out. Cleaning and language filtering reduced 25,737 records to 20,050 usable English reviews — 9,310 positive and 10,740 negative by Steam's own <code>voted_up</code> flag, which is the one label in this dataset that is not inferred.</p>
+    <p>From there: exploratory analysis, four formal hypothesis tests, a supervised model bake-off, a second weak-label experiment, opinion-word extraction, and dictionary-based aspect sentiment over six facets of the game.</p>
+
+    <h2 id="finding">The finding that matters</h2>
+    <p>Six models were trained and evaluated on identical splits. A pretrained DistilBERT SST-2 pipeline came last.</p>
+
+    <div class="tablewrap" style="margin:1.5rem 0;">
+      <table class="data">
+        <thead>
+          <tr><th scope="col">Model</th><th scope="col" class="n">Accuracy</th><th scope="col" class="n">Precision</th><th scope="col" class="n">Recall</th><th scope="col" class="n">F1</th></tr>
+        </thead>
+        <tbody>
+          <tr class="win"><td>TF-IDF + logistic regression</td><td class="n">0.8566</td><td class="n">0.8403</td><td class="n">0.8534</td><td class="n">0.8468</td></tr>
+          <tr><td>TF-IDF + linear SVM</td><td class="n">0.8414</td><td class="n">0.8193</td><td class="n">0.8448</td><td class="n">0.8318</td></tr>
+          <tr><td>BiLSTM (trained from scratch)</td><td class="n">0.8404</td><td class="n">0.8479</td><td class="n">0.7997</td><td class="n">0.8231</td></tr>
+          <tr><td>Random forest</td><td class="n">0.8155</td><td class="n">0.7802</td><td class="n">0.8389</td><td class="n">0.8085</td></tr>
+          <tr><td>Multinomial naive Bayes</td><td class="n">0.7793</td><td class="n">0.8621</td><td class="n">0.6246</td><td class="n">0.7244</td></tr>
+          <tr><td>DistilBERT SST-2 (pretrained)</td><td class="n">0.7565</td><td class="n">0.8184</td><td class="n">0.6114</td><td class="n">0.6999</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="fig">
+      <img src="../assets/img/fifa-model-f1.png" width="1400" height="635" loading="lazy" alt="Bar chart of F1 scores across six models, descending from logistic regression to the DistilBERT transformer.">
+      <figcaption>F1 by model on the same held-out split. The gap between first and last is 14.7 points.</figcaption>
+    </figure>
+
+    <div class="callout">
+      <span class="eyebrow">Why the transformer lost</span>
+      <p>DistilBERT SST-2 was fine-tuned on film reviews and applied here zero-shot. Its recall is 0.6114 — it misses a third of the class it should catch, because gamer register (sarcasm, &ldquo;EA being EA&rdquo;, patch-note grievances) is not the distribution it learned. Meanwhile TF-IDF fits <em>this</em> vocabulary directly from 20,050 in-domain examples. The lesson is not that transformers are worse; it is that a pretrained checkpoint is a domain assumption, and it costs 15 F1 points when the assumption is wrong.</p>
+    </div>
+
+    <p>All figures are positive-class, on the same held-out split. Naive Bayes is the interesting shape in that table: it has the <em>highest</em> precision of any model at 0.8621, and the worst recall at 0.6246 — it is right when it commits and it refuses to commit often. Averaged into F1 that reads as the second-worst model, which is why the individual columns are worth showing rather than a single score.</p>
+    <p>The BiLSTM, trained from scratch on the same data, landed at 0.8231 — close to the linear models, at considerably more cost. On the multi-class variant the ordering held: logistic regression 0.8511 macro-F1, linear SVM 0.8473, BiLSTM 0.8450.</p>
+
+    <figure class="fig fig--stack">
+      <img src="../assets/img/fifa-bilstm.png" width="1400" height="452" loading="lazy" alt="BiLSTM training history: loss and accuracy curves over epochs for training and validation.">
+      <img src="../assets/img/fifa-multiclass.png" width="1400" height="797" loading="lazy" alt="Heatmap of per-class F1 scores across models in the multi-class experiment.">
+      <figcaption>Top: BiLSTM training history over its epochs — loss and accuracy for both the training and validation splits. Bottom: per-class F1 across models in the three-class experiment, where the naive Bayes baseline falls away sharply while the linear models and the BiLSTM stay close together.</figcaption>
+    </figure>
+
+    <h2 id="labels">Being careful about labels</h2>
+    <p>A second experiment used VADER to generate three-class weak labels — 7,167 positive, 6,224 neutral, 6,659 negative. This is a legitimate thing to do and an easy thing to misreport, so the write-up refuses to call those labels ground truth. It also quantifies the gap: VADER's binary sentiment agrees with Steam's own <code>voted_up</code> flag for <strong>69.36%</strong> of cleaned reviews. That number is the reason the multi-class results are framed as an experiment rather than a measurement.</p>
+
+    <h3 id="hypotheses">Four hypothesis tests</h3>
+    <ul>
+      <li><strong>H1</strong> — positive reviews are found more helpful by other users. Mann-Whitney U = 59,279,016.5, p ≈ 5.9e−121. Median helpfulness 5.07 positive vs 0.32 negative.</li>
+      <li><strong>H2</strong> — negative reviewers had played longer. U = 38,080,985.5, p ≈ 7.6e−187. Median 30 hours negative vs 16 positive, which inverts the assumption that complaints come from people who barely played.</li>
+      <li><strong>H3</strong> — sentiment is not independent of purchase channel. χ² = 211.35, p ≈ 7.3e−43.</li>
+      <li><strong>H4</strong> — the VADER/<code>voted_up</code> agreement rate above.</li>
+    </ul>
+
+    <h2 id="aspects">From metrics to something actionable</h2>
+    <p>Classification accuracy tells a publisher nothing about what to fix. So the last stage assigns each review to six game aspects by dictionary matching and scores sentiment within each.</p>
+
+    <figure class="fig">
+      <img src="../assets/img/fifa-aspects.png" width="1400" height="889" loading="lazy" alt="Heatmap of sentiment by game aspect, with price and monetisation deeply negative and graphics positive.">
+      <figcaption>Sentiment by aspect. Only one column is net positive.</figcaption>
+    </figure>
+
+    <div class="tablewrap" style="margin:1.5rem 0;">
+      <table class="data">
+        <thead><tr><th scope="col">Aspect</th><th scope="col" class="n">Mentions</th><th scope="col" class="n">Negative</th><th scope="col" class="n">Avg compound</th></tr></thead>
+        <tbody>
+          <tr><td>Price / monetisation</td><td class="n">4,207</td><td class="n">84.22%</td><td class="n">−0.1039</td></tr>
+          <tr><td>Servers / online</td><td class="n">721</td><td class="n">83.22%</td><td class="n">−0.0982</td></tr>
+          <tr><td>Performance / bugs</td><td class="n">2,241</td><td class="n">80.05%</td><td class="n">−0.1509</td></tr>
+          <tr><td>Gameplay</td><td class="n">2,197</td><td class="n">66.04%</td><td class="n">+0.0591</td></tr>
+          <tr><td>Career / content</td><td class="n">1,769</td><td class="n">64.44%</td><td class="n">+0.1073</td></tr>
+          <tr class="win"><td>Graphics</td><td class="n">752</td><td class="n">43.75%</td><td class="n">+0.3116</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Two things fall out of that table. Monetisation is the largest complaint by volume <em>and</em> the most negative by rate — 4,207 mentions, more than any other aspect, 84% of them negative. And the ordering by volume is almost the inverse of the ordering by sentiment: the aspects players talk about most are the ones they are angriest about, while graphics, the only aspect they are broadly happy with, is also the least discussed at 752 mentions.</p>
+    <p>That is a one-slide answer to &ldquo;where should we spend next quarter&rdquo;, and no amount of classifier accuracy would have produced it. Note that mention counts sum to more than the corpus — a review complaining about price <em>and</em> servers is counted under both.</p>
+
+    <figure class="fig">
+      <img src="../assets/img/fifa-wordcloud.jpg" width="1200" height="685" loading="lazy" alt="Word cloud built from negative reviews, dominated by terms about money, servers and the game being broken.">
+      <figcaption>Negative-review vocabulary. One of 45 figures generated by the notebook.</figcaption>
+    </figure>
+
+    <h2 id="limits">Scale and limitations</h2>
+    <p>One notebook, 131 cells, 1,436 lines of code, 30-plus exported result CSVs and 45 figures, run on Google Colab. Written up as a 53-page report.</p>
+    <ul>
+      <li>Aspect assignment is dictionary-based, so it inherits the dictionary's blind spots — a complaint phrased without any keyword is invisible to it.</li>
+      <li>English-only after language filtering, which drops a fifth of the corpus and likely skews the regional picture.</li>
+      <li>DistilBERT was evaluated zero-shot. Fine-tuning it on this corpus would very likely close the gap; the comparison as run measures &ldquo;pretrained off the shelf&rdquo;, not &ldquo;transformers&rdquo;.</li>
+    </ul>
+
+    <div class="nextprev">
+      <a href="parkviewrt.html">&larr; ParkViewRT</a>
+      <a href="sti-dashboard.html">Next: Global STI Trends Dashboard &rarr;</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <ul class="contactlist">
+        <li><a href="mailto:yaserabulaban@gmail.com">yaserabulaban@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/yaser-abulaban-82b199236/" rel="noopener">linkedin.com/in/yaser-abulaban</a></li>
+        <li><a href="https://github.com/Yaserabulaban" rel="noopener">github.com/Yaserabulaban</a></li>
+      </ul>
+    </div>
+    <p class="foot__fine">Figures generated by the project notebook. Metrics quoted from its classification reports.</p>
+  </div>
+</footer>
+
+</body>
+</html>

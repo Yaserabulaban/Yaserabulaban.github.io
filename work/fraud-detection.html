@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explainable Insurance Fraud Detection</title>
+<meta name="description" content="Fraud classification on a 5.98% positive class, tuned on fraud-class F1, paired with FP-Growth association rules so every prediction comes with a reason.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script src="../assets/js/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="topbar__name" href="../">Yaser E. H. Abulaban</a>
+  <nav>
+    <a href="../#work">Work</a>
+    <a href="../#index" class="opt">All projects</a>
+    <a href="../#experience" class="opt">Experience</a>
+    <a href="../#contact">Contact</a>
+    <button class="themetoggle" type="button">Auto</button>
+  </nav>
+</header>
+
+<main id="main">
+
+<section class="cs__head">
+  <div class="wrap wrap--case">
+    <a class="back" href="../#work">&larr; Selected work</a>
+    <span class="eyebrow">Data mining · group of 2</span>
+    <h1 class="cs__title">Insurance fraud: a prediction you can explain</h1>
+    <p class="lede cs__lede">Fraud is 5.98% of these claims, which makes accuracy actively misleading. This project reports the metrics that survive that imbalance — and pairs every prediction with human-readable rules mined from the same data.</p>
+    <dl class="cs__meta">
+      <div><dt>Role</dt><dd>Group of 2</dd></div>
+      <div><dt>Data</dt><dd>15,420 claims · 33 attributes · 923 fraudulent (5.99%)</dd></div>
+      <div><dt>Stack</dt><dd>Python, scikit-learn, imbalanced-learn, mlxtend (FP-Growth), Streamlit, Plotly</dd></div>
+      <div><dt>Delivered</dt><dd>4 notebooks + a multi-page Streamlit app (1,096 lines)</dd></div>
+      <div><dt>Code</dt><dd><a href="https://github.com/Yaserabulaban/insurance-fraud-detection" rel="noopener">github.com/Yaserabulaban/insurance-fraud-detection</a></dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="wrap wrap--case" style="padding-bottom:4rem;">
+  <div class="prose">
+
+    <nav class="toc" aria-label="On this page">
+      <span class="eyebrow">On this page</span>
+      <ol>
+        <li><a href="#accuracy">Why accuracy is the wrong headline</a></li>
+        <li><a href="#smote">A negative result, kept in</a></li>
+        <li><a href="#rules">Explainability as a first-class output</a></li>
+        <li><a href="#shipped">Shipped, not just notebooked</a></li>
+        <li><a href="#limits">Limitations</a></li>
+      </ol>
+    </nav>
+
+    <div class="abbr">
+      <span class="eyebrow">Terms used on this page</span>
+      <table>
+        <thead><tr><th scope="col">Term</th><th scope="col">Stands for</th><th scope="col">What it is</th></tr></thead>
+        <tbody>
+          <tr><td>ROC-AUC</td><td>Receiver Operating Characteristic – Area Under Curve</td><td>How well the model separates the two classes across every threshold. 0.5 is a coin flip, 1.0 is perfect</td></tr>
+          <tr><td>PR-AUC</td><td>Precision-Recall Area Under Curve</td><td>The better measure when the positive class is rare — it ignores the easy majority entirely</td></tr>
+          <tr><td>SMOTE</td><td>Synthetic Minority Over-sampling Technique</td><td>Manufactures new minority-class rows by interpolating between real ones. It did not help here</td></tr>
+          <tr><td>FP-Growth</td><td>Frequent Pattern Growth</td><td>An algorithm that finds item combinations occurring together often, without generating every candidate first</td></tr>
+          <tr><td>Precision</td><td>—</td><td>Of everything flagged as fraud, how much really was</td></tr>
+          <tr><td>Recall</td><td>—</td><td>Of all the real fraud, how much got flagged</td></tr>
+          <tr><td>Lift</td><td>—</td><td>How much more often a rule holds than chance would predict. A lift near 1.0 means the rule says nothing</td></tr>
+          <tr><td>Decision threshold</td><td>—</td><td>The probability above which a prediction is called fraud. Left at 0.5 by default — which is wrong when 6% of rows are positive</td></tr>
+          <tr><td>Base rate</td><td>—</td><td>How common the positive class is to begin with. Here 5.99%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="accuracy">Why accuracy is the wrong headline</h2>
+    <p>A model that predicts &ldquo;not fraud&rdquo; for every single claim in this dataset scores 94% accuracy. It is also completely worthless. So the project never leads with accuracy: models were selected on F1 for the fraud class, and every model got its own tuned decision threshold rather than the default 0.5.</p>
+
+    <figure class="fig">
+      <img src="../assets/img/fraud-threshold.png" width="1188" height="707"
+           alt="Line chart of fraud-class F1 against probability threshold for four models, each peaking at a different threshold value.">
+      <figcaption>Fraud-class F1 as a function of decision threshold. Gradient boosting peaks sharply at 0.150; random forest at 0.350; logistic regression not until 0.650. Using 0.5 for all four would have picked the wrong winner and understated three of them.</figcaption>
+    </figure>
+
+    <p>That chart is the methodological centre of the project. The threshold is not a hyperparameter you can leave at its default when the classes are this skewed — it changes which model looks best.</p>
+
+    <div class="tablewrap" style="margin:1.5rem 0;">
+      <table class="data">
+        <thead><tr><th scope="col">Model</th><th scope="col" class="n">Thr.</th><th scope="col" class="n">ROC-AUC</th><th scope="col" class="n">PR-AUC</th><th scope="col" class="n">Precision</th><th scope="col" class="n">Recall</th><th scope="col" class="n">F1</th><th scope="col" class="n">Accuracy</th></tr></thead>
+        <tbody>
+          <tr class="win"><td>Gradient boosting</td><td class="n">0.150</td><td class="n">0.891</td><td class="n">0.354</td><td class="n">0.296</td><td class="n">0.486</td><td class="n">0.368</td><td class="n">0.900</td></tr>
+          <tr><td>Random forest</td><td class="n">0.350</td><td class="n">0.875</td><td class="n">0.302</td><td class="n">0.272</td><td class="n">0.562</td><td class="n">0.367</td><td class="n">0.884</td></tr>
+          <tr><td>Logistic regression</td><td class="n">0.650</td><td class="n">0.800</td><td class="n">0.152</td><td class="n">0.148</td><td class="n">0.595</td><td class="n">0.237</td><td class="n">0.770</td></tr>
+          <tr><td>Decision tree</td><td class="n">0.750</td><td class="n">0.649</td><td class="n">0.198</td><td class="n">0.196</td><td class="n">0.384</td><td class="n">0.260</td><td class="n">0.869</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Precision and recall are for the fraud class, on 185 fraud cases in a 3,084-row test set. Logistic regression is the trap in that table — it has the <em>highest</em> recall of the four at 0.595, which looks like the best fraud-catcher until you read across: precision 0.148 and PR-AUC 0.152 mean it is flagging almost everything, and its accuracy drops to 0.770 as a result. Gradient boosting catches fewer frauds and is still the better model.</p>
+
+    <div class="callout callout--warn">
+      <span class="eyebrow">Reading these numbers honestly</span>
+      <p>Fraud-class precision is 0.296 — roughly two false positives for every genuine catch — at 0.486 recall. In practice that means the model is a triage tool that hands an investigator a shortlist, not an adjudicator that denies claims. On a base rate of 5.99% it is still a real lift over random selection, but presenting 0.900 accuracy as the result would be dishonest, and the report flags it as a class-imbalance artefact.</p>
+    </div>
+
+    <h2 id="smote">A negative result, kept in</h2>
+    <p>SMOTE was the obvious move: oversample the minority class from 738 to 11,598 training examples and retrain. It made things worse in the way that matters.</p>
+
+    <div class="tablewrap" style="margin:1.5rem 0;">
+      <table class="data">
+        <thead><tr><th scope="col">Configuration</th><th scope="col" class="n">ROC-AUC</th><th scope="col" class="n">PR-AUC</th><th scope="col" class="n">Accuracy</th></tr></thead>
+        <tbody>
+          <tr class="win"><td>Best model, no SMOTE</td><td class="n">0.891</td><td class="n">0.354</td><td class="n">0.900</td></tr>
+          <tr><td>Best model with SMOTE</td><td class="n">0.826</td><td class="n">0.195</td><td class="n">0.827</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="fig">
+      <img src="../assets/img/fraud-threshold-smote.png" width="1188" height="707" loading="lazy"
+           alt="The same threshold-versus-F1 chart for SMOTE-resampled models, with visibly lower and flatter curves.">
+      <figcaption>The same threshold sweep after SMOTE. Recall rises, precision and PR-AUC fall — synthetic minority samples interpolated between sparse real fraud cases introduce noise the classifier then learns.</figcaption>
+    </figure>
+
+    <p>SMOTE was dropped, and the reason is documented rather than the experiment being quietly deleted. Reporting the thing that did not work is most of what makes the thing that did work believable.</p>
+
+    <h2 id="rules">Explainability as a first-class output</h2>
+    <p>An investigator will not act on a probability score alone; they need to know what pattern the claim matches. So alongside the classifier, the same data was mined for association rules with FP-Growth — and then aggressively filtered:</p>
+
+    <div class="tablewrap" style="margin:1.5rem 0;">
+      <table class="data">
+        <thead><tr><th scope="col">Stage</th><th scope="col" class="n">Count</th></tr></thead>
+        <tbody>
+          <tr><td>Frequent itemsets generated</td><td class="n">7,411</td></tr>
+          <tr><td>Fraud-related itemsets retained</td><td class="n">332</td></tr>
+          <tr><td>Rules generated</td><td class="n">285,919</td></tr>
+          <tr><td>Rules with fraud as the consequent</td><td class="n">331</td></tr>
+          <tr class="win"><td>Strong fraud rules after filtering</td><td class="n">130</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>285,919 down to 130. Rule mining is trivially easy to do badly — leave the thresholds loose and you get a plausible-sounding rule for absolutely anything. The filtering funnel is the work.</p>
+
+    <figure class="fig fig--stack">
+      <img src="../assets/img/fraud-eda.png" width="1189" height="489" loading="lazy" alt="Two bar charts: fraud rate by policy type, highest for sport collision policies, and fraud rate by accident area, higher in rural areas.">
+      <img src="../assets/img/fraud-lift.png" width="788" height="490" loading="lazy" alt="Distribution of lift values across the retained fraud rules.">
+      <figcaption>Top: exploratory signal from the claims data — sport-collision policies carry roughly 14% fraud against a 5.99% base rate, and rural accidents run higher than urban. Bottom: the distribution of lift values across the 130 rules that survived filtering.</figcaption>
+    </figure>
+
+    <h2 id="shipped">Shipped, not just notebooked</h2>
+    <p>The four notebooks (EDA, preprocessing, modelling, rule mining) persist their outputs — <code>best_model.pkl</code>, <code>best_threshold.pkl</code>, <code>fraud_rules_all.csv</code> — as artefacts. A multi-page Streamlit app loads them: one page scores a claim, another lets you explore the retained rules interactively. The threshold travels with the model, which matters, because a model saved without its tuned threshold silently reverts to 0.5 and loses most of its value.</p>
+
+    <h2 id="limits">Limitations</h2>
+    <ul>
+      <li>Single public dataset, one insurer, one time period. Fraud patterns shift; there is no temporal validation here.</li>
+      <li>Association rules describe co-occurrence, not causation, and none of the 130 should be read as a rule of adjudication.</li>
+      <li>0.296 precision means a human investigator is mandatory. This is decision support, not a decision.</li>
+      <li>No cost-sensitive evaluation. The right threshold depends on the ratio between an investigation's cost and a missed fraud's cost, and we did not have those figures.</li>
+    </ul>
+
+    <div class="nextprev">
+      <a href="cartly.html">&larr; Cartly</a>
+      <a href="fer-study.html">Next: Does preprocessing help FER? &rarr;</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <ul class="contactlist">
+        <li><a href="mailto:yaserabulaban@gmail.com">yaserabulaban@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/yaser-abulaban-82b199236/" rel="noopener">linkedin.com/in/yaser-abulaban</a></li>
+        <li><a href="https://github.com/Yaserabulaban" rel="noopener">github.com/Yaserabulaban</a></li>
+      </ul>
+    </div>
+    <p class="foot__fine">Metrics and figures taken from the submitted notebooks and report.</p>
+  </div>
+</footer>
+
+</body>
+</html>

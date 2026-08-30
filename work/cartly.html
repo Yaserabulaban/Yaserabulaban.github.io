@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cartly — Recipe to Cart</title>
+<meta name="description" content="A three-role grocery marketplace on a PHP MVC micro-framework written from scratch, with a deterministic engine that turns a recipe into a merchant-grouped shopping cart.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script src="../assets/js/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="topbar__name" href="../">Yaser E. H. Abulaban</a>
+  <nav>
+    <a href="../#work">Work</a>
+    <a href="../#index" class="opt">All projects</a>
+    <a href="../#experience" class="opt">Experience</a>
+    <a href="../#contact">Contact</a>
+    <button class="themetoggle" type="button">Auto</button>
+  </nav>
+</header>
+
+<main id="main">
+
+<section class="cs__head">
+  <div class="wrap wrap--case">
+    <a class="back" href="../#work">&larr; Selected work</a>
+    <span class="eyebrow">Web application development · group of 4</span>
+    <h1 class="cs__title">Cartly: a recipe becomes a grocery cart</h1>
+    <p class="lede cs__lede">Ten thousand lines of PHP on a framework we wrote ourselves, twenty-one tables, and an ordering engine whose tie-break rules are published so you can check its answer by hand.</p>
+    <dl class="cs__meta">
+      <div><dt>Role</dt><dd>Group of 4 — I owned the merchant module end to end, plus the database schema and seed data</dd></div>
+      <div><dt>Scale</dt><dd>~10,400 lines PHP · 120 files · 21 tables · 181 commits</dd></div>
+      <div><dt>Stack</dt><dd>PHP 8.1 (no framework), MySQL, PDO, vanilla JS, Composer, PHPUnit, GitHub Actions</dd></div>
+      <div><dt>Code</dt><dd><a href="https://github.com/Yaserabulaban/Cartly-Recipe-to-Cart-Marketplace" rel="noopener">github.com/Yaserabulaban/Cartly-Recipe-to-Cart-Marketplace</a><br><span style="color:var(--muted);font-size:.9em;">Fork — the original repository belongs to a teammate</span></dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="wrap wrap--case" style="padding-bottom:4rem;">
+  <div class="prose">
+
+    <div class="callout" style="margin-top:0;">
+      <span class="eyebrow">About the repository</span>
+      <p>This was a four-person assignment and the canonical repository lives on a teammate's account. The link above is my fork of it, kept so the code is readable alongside this write-up. Everything I claim below is work I did; the merchant module and the database schema were mine end to end.</p>
+    </div>
+
+    <nav class="toc" aria-label="On this page">
+      <span class="eyebrow">On this page</span>
+      <ol>
+        <li><a href="#what">What it does</a></li>
+        <li><a href="#engine">The engine</a></li>
+        <li><a href="#determinism">The tie-break order</a></li>
+        <li><a href="#framework">The framework underneath</a></li>
+        <li><a href="#mypart">My part: merchant module and schema</a></li>
+        <li><a href="#process">How the team worked</a></li>
+        <li><a href="#limits">Limitations</a></li>
+      </ol>
+    </nav>
+
+    <div class="abbr">
+      <span class="eyebrow">Terms used on this page</span>
+      <table>
+        <thead><tr><th scope="col">Term</th><th scope="col">Stands for</th><th scope="col">What it is</th></tr></thead>
+        <tbody>
+          <tr><td>MVC</td><td>Model – View – Controller</td><td>A structure that keeps data, presentation and request handling in separate layers</td></tr>
+          <tr><td>ERD</td><td>Entity-Relationship Diagram</td><td>The map of database tables and how they reference each other</td></tr>
+          <tr><td>PDO</td><td>PHP Data Objects</td><td>PHP's database layer. Used here with prepared statements, which is what stops SQL injection</td></tr>
+          <tr><td>CSRF</td><td>Cross-Site Request Forgery</td><td>An attack where another site makes a request as a logged-in user. Blocked with a per-form token</td></tr>
+          <tr><td>CRUD</td><td>Create, Read, Update, Delete</td><td>The four basic operations on a record</td></tr>
+          <tr><td>RFC</td><td>Request For Comments</td><td>A short written proposal circulated before changing shared code</td></tr>
+          <tr><td>CI</td><td>Continuous Integration</td><td>Automated checks that run on every pull request</td></tr>
+          <tr><td>3NF</td><td>Third Normal Form</td><td>A normalisation level where no non-key column depends on another non-key column</td></tr>
+          <tr><td>Migration</td><td>—</td><td>A numbered, version-controlled script that changes the database schema</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="what">What it does</h2>
+    <p>A grocery marketplace with three roles — customer, merchant, admin. The customer-facing hook is the part worth talking about: pick a recipe, set how many people you are cooking for, and get a cart. Not a shopping list. An actual cart, grouped by merchant, with real package quantities and prices.</p>
+    <p>That sounds like a small feature and is where all the difficulty lives. Recipes are written in grams and millilitres; shops sell 500&nbsp;g bags and 1&nbsp;L bottles. Four ingredients might be cheapest across three different merchants, which means three deliveries. And the answer has to be the same every time, because a cart that reshuffles between page loads destroys trust immediately.</p>
+
+    <h2 id="engine">The engine</h2>
+    <p>Three lines of arithmetic:</p>
+    <pre style="overflow-x:auto;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);padding:1rem;font-family:var(--font-mono);font-size:.8rem;line-height:1.7;"><code>scale_factor      = selected_servings / base_servings
+scaled_quantity   = recipe_ingredient.quantity * scale_factor
+required_packages = CEIL(scaled_quantity / product.package_quantity)</code></pre>
+    <p>The <code>CEIL</code> is the honest part — you cannot buy 0.4 of a bag, so the cart shows what you will actually pay and flags the excess rather than quietly pretending the fractional amount is free.</p>
+
+    <h3 id="determinism">Determinism through a published tie-break order</h3>
+    <p>When several products satisfy an ingredient, candidates are ranked in a fixed sequence:</p>
+    <ol>
+      <li>merchants already used in this cart — fewer deliveries beats a marginally cheaper item</li>
+      <li>fewest packages</li>
+      <li>lowest excess quantity</li>
+      <li>lowest cost</li>
+      <li>highest rating</li>
+      <li>lowest product ID</li>
+    </ol>
+    <p>The last criterion is the one that makes it fully deterministic: no matter how many products tie on everything else, the ID breaks it. Same recipe and same catalogue always produce the identical cart, and because the order is documented in the README anyone can verify a given result by hand. Every edge case — ingredient with no stocked product, package larger than the whole requirement, merchant out of stock mid-build — produces an explicit warning attached to the cart instead of a silently missing line.</p>
+
+    <h2 id="framework">The framework underneath</h2>
+    <p>The brief ruled out Laravel and Symfony, so the team built the layer instead: router, base controller, base model, autoloader, CSRF token handling, validator, flash messaging and a file-upload helper. Not because that is better than a framework — it plainly is not — but it does mean nobody on the team could treat request handling, routing or CSRF as magic. Every request path is code somebody in the room wrote.</p>
+    <p>All database access goes through PDO prepared statements. Sessions handle auth, passwords are hashed, mutating forms carry CSRF tokens, and payment runs through a mock gateway with its own transaction records.</p>
+
+    <h2 id="mypart">My part: the merchant module and the schema</h2>
+    <p>I owned the whole merchant side — dashboard, store profile, product CRUD, stock, price, package and category management, voucher creation, order management and return requests — and designed the database the rest of the application sits on.</p>
+
+    <figure class="fig">
+      <img src="../assets/img/cartly-erd.jpg" width="1800" height="1029"
+           alt="Entity-relationship diagram of 21 tables grouped into users and merchants, catalogue and recipes, cart and vouchers, orders and payments, and feedback and reports.">
+      <figcaption>21 tables in five groups. Normalised, with foreign keys and unique constraints modelled rather than enforced in application code, and delivered as six numbered migrations so the schema has a version history.</figcaption>
+    </figure>
+
+    <p>Two schema decisions I would defend in review:</p>
+    <ul>
+      <li><strong><code>merchant_orders</code> splits a customer order per merchant.</strong> One checkout can produce several fulfilments with independent statuses, delivery tracking and subtotals. Without that table, a two-merchant order has no coherent state — one half shipped and the other half cancelled has nowhere to live.</li>
+      <li><strong><code>order_items</code> stores a product snapshot, not just a foreign key.</strong> Name, unit price and quantity are copied at purchase time. When a merchant later edits a price, historical orders and receipts stay truthful.</li>
+    </ul>
+
+    <h2 id="process">How the team worked</h2>
+    <p>Unusually for coursework, this repo has a real process attached — and it is the thing that transferred most directly to working at UniPin a few months later.</p>
+    <ul>
+      <li>181 commits across four contributors, branches linked to tickets</li>
+      <li>GitHub Actions for PHP linting and pull-request checks</li>
+      <li>An RFC template for changes that touched shared code, and a two-reviewer rule</li>
+      <li>12 PHPUnit test files</li>
+      <li>2,861 lines of engineering documentation — a 1,200-line specification, an architecture document, a contributing guide, a changelog and an RFC workflow description</li>
+    </ul>
+
+    <h2 id="limits">Limitations</h2>
+    <ul>
+      <li>Payment is a mock gateway. No real PSP integration, no PCI scope.</li>
+      <li>Test coverage exists but is thin relative to 10,400 lines — the engine and the schema are covered, the views largely are not.</li>
+      <li>Product matching relies on merchants classifying products against a shared ingredient list. A real deployment would need fuzzy matching or a curated catalogue, because merchant-entered data will not be that tidy.</li>
+      <li>No caching layer; the cart builder queries per ingredient, which is fine at coursework scale and would not be at real scale.</li>
+    </ul>
+
+    <div class="nextprev">
+      <a href="sti-dashboard.html">&larr; Global STI Trends</a>
+      <a href="fraud-detection.html">Next: Insurance fraud detection &rarr;</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <ul class="contactlist">
+        <li><a href="mailto:yaserabulaban@gmail.com">yaserabulaban@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/yaser-abulaban-82b199236/" rel="noopener">linkedin.com/in/yaser-abulaban</a></li>
+        <li><a href="https://github.com/Yaserabulaban" rel="noopener">github.com/Yaserabulaban</a></li>
+      </ul>
+    </div>
+    <p class="foot__fine">Line counts and commit figures taken from the submitted repository. Diagram from the project's documentation folder.</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yaser Abulaban — Backend &amp; Data Science</title>
+<meta name="description" content="Backend developer and data scientist. Three years across analytics consultancy and production engineering, plus a first-class computer science degree. Selected projects with measured results.">
+<meta property="og:title" content="Yaser Abulaban — Backend &amp; Data Science">
+<meta property="og:description" content="Production backend engineering, computer vision, applied ML and data visualisation — with the numbers behind each result.">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="topbar__name" href="./">Yaser E. H. Abulaban</a>
+  <nav>
+    <a href="#work">Work</a>
+    <a href="#index" class="opt">All projects</a>
+    <a href="#experience">Experience</a>
+    <a href="#credentials" class="opt">Credentials</a>
+    <a href="#contact">Contact</a>
+    <button class="themetoggle" type="button">Auto</button>
+  </nav>
+</header>
+
+<main id="main">
+
+<!-- ============================ HERO ============================ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero__grid">
+      <div>
+        <span class="eyebrow">Jeddah, Saudi Arabia · open to relocation</span>
+        <h1>I build systems that can <span>prove</span> they work.</h1>
+        <p class="hero__sub">Backend developer and data scientist. Three years across analytics consultancy and production engineering, with a first-class computer science degree in between.</p>
+        <div class="hero__meta">
+          <span>Backend Developer, UniPin</span>
+          <span>BCS (Hons) Data Science · First Class</span>
+          <span>CGPA 3.91 · Dean's List 9/9</span>
+        </div>
+        <div class="hero__cta">
+          <a class="btn btn--solid" href="#work">See selected work</a>
+          <a class="btn" href="https://github.com/Yaserabulaban" rel="noopener">GitHub</a>
+          <a class="btn" href="https://www.linkedin.com/in/yaser-abulaban-82b199236/" rel="noopener">LinkedIn</a>
+          <a class="btn" href="#contact">Get in touch</a>
+        </div>
+      </div>
+
+      <figure class="hudshot">
+        <div class="hudbar" aria-hidden="true">
+          <span>FCI</span><span>|</span>
+          <span>slots: <b>78</b></span><span>|</span>
+          <span class="no">occupied: 73</span><span>|</span>
+          <span class="ok">available: 1</span><span>|</span>
+          <span class="oc">occluded: 4</span><span>|</span>
+          <span>detected: <b>99</b></span>
+        </div>
+        <img src="assets/img/parkviewrt-detect-day.jpg" width="1600" height="900"
+             alt="Aerial parking-lot frame with 78 slot polygons and 99 detected vehicle boxes drawn over it, each bay coloured by occupancy status.">
+        <figcaption>ParkViewRT debug overlay — one analysed frame, 78 monitored bays, MMU FCI car park.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ STATS ============================ -->
+<section class="band band--plain">
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat stat--accent">
+        <span class="stat__n">~3 yrs</span>
+        <span class="stat__l">Industry experience, consultancy and product</span>
+      </div>
+      <div class="stat">
+        <span class="stat__n">9 / 9</span>
+        <span class="stat__l">Trimesters on the faculty Dean's List</span>
+      </div>
+      <div class="stat">
+        <span class="stat__n">3.91</span>
+        <span class="stat__l">CGPA · First Class Honours</span>
+      </div>
+      <div class="stat stat--good">
+        <span class="stat__n">10</span>
+        <span class="stat__l">Third-party providers integrated in production</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ SELECTED WORK ============================ -->
+<section class="band" id="work">
+  <div class="wrap">
+    <div class="band__head">
+      <span class="eyebrow">Selected work</span>
+      <h2>Six projects, and the evidence behind them</h2>
+      <p class="lede">Each of these has a number attached to it that I can defend — a benchmark I ran, a baseline I beat, or a result I decided <em>not</em> to claim. The write-ups say what was measured, on what data, and where the limits are.</p>
+    </div>
+
+    <div class="records">
+
+      <!-- 1 -->
+      <article class="record">
+        <div class="record__body">
+          <span class="record__tag">Final year project · computer vision</span>
+          <h3>ParkViewRT — vision-based parking occupancy</h3>
+          <p class="record__thesis">A camera replaces a sensor in every bay. YOLO detects vehicles, Shapely maps each detection to one of 197 hand-labelled slot polygons, and a React dashboard shows every bay as occupied, available, occluded or unmonitored — frame by frame, day and night.</p>
+          <dl class="record__facts">
+            <dt>Result</dt><dd>2,167 / 2,167 verified slot labels correct — 0 false-available, 0 false-occupied, 0 false-occluded</dd>
+            <dt>Method</dt><dd>4 YOLO checkpoints benchmarked; 210 threshold combinations grid-searched; ~516 ms per frame</dd>
+            <dt>Stack</dt><dd>Python · FastAPI · Ultralytics YOLO11 · Shapely · OpenCV · React 18 · TypeScript · Vite · Tailwind</dd>
+            <dt>Scale</dt><dd>4,806 lines Python · 10 endpoints · 23 pytest tests · 47 commits</dd>
+            <dt>Role</dt><dd>Solo</dd>
+          </dl>
+          <div class="record__foot">
+            <a class="btn btn--solid" href="work/parkviewrt.html">Read the case study</a>
+            <a class="btn" href="https://github.com/Yaserabulaban/parkviewrt" rel="noopener">Code</a>
+          </div>
+        </div>
+        <div class="record__fig">
+          <img src="assets/img/parkviewrt-ui-fci-day.jpg" width="1500" height="771" loading="lazy"
+               alt="The ParkViewRT dashboard showing the FCI parking layout with rows of bays coloured red, green and amber.">
+        </div>
+      </article>
+
+      <!-- 2 -->
+      <article class="record record--flip">
+        <div class="record__body">
+          <span class="record__tag">Social media computing · NLP</span>
+          <h3>What 20,050 Steam reviews say about FIFA 23</h3>
+          <p class="record__thesis">A full opinion-mining pipeline: cleaning, four hypothesis tests, six models on identical splits, and dictionary-based aspect sentiment across six facets of the game. The headline finding is a warning about defaults — TF-IDF with logistic regression beat a pretrained transformer by 15 F1 points.</p>
+          <dl class="record__facts">
+            <dt>Result</dt><dd>Logistic regression F1 <strong>0.8468</strong> vs DistilBERT SST-2 <strong>0.6999</strong>; BiLSTM trained from scratch 0.8231</dd>
+            <dt>Insight</dt><dd>Across six aspects, price/monetisation was both the loudest (4,207 mentions) and the angriest (84.22% negative); graphics was the happiest and the quietest</dd>
+            <dt>Stack</dt><dd>Python · scikit-learn · NLTK/VADER · TensorFlow (BiLSTM) · HuggingFace Transformers · SciPy</dd>
+            <dt>Scale</dt><dd>25,737 raw reviews → 20,050 cleaned · 1,436 lines · 45 figures</dd>
+            <dt>Role</dt><dd>Group of 2</dd>
+          </dl>
+          <div class="record__foot">
+            <a class="btn btn--solid" href="work/fifa-sentiment.html">Read the case study</a>
+            <a class="btn" href="https://github.com/Yaserabulaban/fifa23-review-sentiment" rel="noopener">Code</a>
+          </div>
+        </div>
+        <div class="record__fig">
+          <img src="assets/img/fifa-model-f1.png" width="1400" height="635" loading="lazy"
+               alt="Bar chart of F1 scores by model, with logistic regression highest and the DistilBERT transformer lowest.">
+        </div>
+      </article>
+
+      <!-- 3 -->
+      <article class="record">
+        <div class="record__body">
+          <span class="record__tag">Data visualisation · D3</span>
+          <h3>Global STI Trends — six linked views, no chart library</h3>
+          <p class="record__thesis">67,438 records covering 200 countries from 1990 to 2024, rendered as a choropleth, ranked bars, a multi-line time series, an animated bubble chart, a year-on-year lollipop and a share donut — all cross-filtered through one shared state module, all hand-written in D3.</p>
+          <dl class="record__facts">
+            <dt>Data</dt><dd>67,438 records · 31 attributes · 200 countries · 1990–2024</dd>
+            <dt>Decision</dt><dd>Raw values are not comparable across metrics, so everything is scored against the maximum within its own disease-and-metric group</dd>
+            <dt>Stack</dt><dd>D3.js v7 · ES modules · vanilla JS · GeoJSON · Python preprocessing</dd>
+            <dt>Scale</dt><dd>2,351 lines · 12 JS modules · 6 charts + 6 reactive KPI cards</dd>
+            <dt>Role</dt><dd>Group of 3 — I built the time series, the animated bubble chart and the dashboard integration</dd>
+          </dl>
+          <div class="record__foot">
+            <a class="btn btn--solid" href="work/sti-dashboard.html">Read the case study</a>
+            <a class="btn" href="https://github.com/Yaserabulaban/sti-trends-dashboard" rel="noopener">Code</a>
+          </div>
+        </div>
+        <div class="record__fig">
+          <img src="assets/img/sti-dashboard.png" width="1500" height="1313" loading="lazy"
+               alt="The Global STI Trends dashboard: filter row, six KPI cards, and a world choropleth map coloured from yellow to deep red.">
+        </div>
+      </article>
+
+      <!-- 4 -->
+      <article class="record record--flip">
+        <div class="record__body">
+          <span class="record__tag">Web application development · full stack</span>
+          <h3>Cartly — a recipe becomes a grocery cart</h3>
+          <p class="record__thesis">A three-role marketplace on a PHP MVC micro-framework the team wrote from scratch — own router, autoloader, CSRF layer and validator. Its centre is a deterministic engine that scales a recipe by servings, converts each ingredient into whole package counts, and picks products by a published tie-break order.</p>
+          <dl class="record__facts">
+            <dt>Scale</dt><dd>~10,400 lines PHP across 120 files · 21 normalised tables · 6 migrations · 12 PHPUnit test files · 181 commits</dd>
+            <dt>Engineering</dt><dd>GitHub Actions CI, RFC-based change process, two-reviewer rule, 2,861 lines of specification and architecture docs</dd>
+            <dt>Stack</dt><dd>PHP 8.1 (no framework) · MySQL · PDO prepared statements · vanilla JS · Composer · PHPUnit</dd>
+            <dt>Role</dt><dd>Group of 4 — I owned the entire merchant module and the database schema</dd>
+          </dl>
+          <div class="record__foot">
+            <a class="btn btn--solid" href="work/cartly.html">Read the case study</a>
+            <a class="btn" href="https://github.com/Yaserabulaban/Cartly-Recipe-to-Cart-Marketplace" rel="noopener">Code (fork)</a>
+          </div>
+        </div>
+        <div class="record__fig">
+          <img src="assets/img/cartly-erd.jpg" width="1800" height="1029" loading="lazy"
+               alt="The Cartly entity-relationship diagram: 21 tables grouped into users, catalogue, cart, orders and reports.">
+        </div>
+      </article>
+
+      <!-- 5 -->
+      <article class="record">
+        <div class="record__body">
+          <span class="record__tag">Data mining · imbalanced classification</span>
+          <h3>Insurance fraud: a prediction you can explain</h3>
+          <p class="record__thesis">Fraud is 5.98% of the claims in this dataset, which makes accuracy a liar. So the model is tuned on fraud-class F1 with an explicit decision threshold, and every prediction is paired with human-readable association rules mined from the same data — 285,919 candidates filtered down to 130 that hold up.</p>
+          <dl class="record__facts">
+            <dt>Result</dt><dd>Gradient boosting, threshold 0.150: ROC-AUC <strong>0.891</strong>, PR-AUC 0.354, fraud recall 0.486 at precision 0.296</dd>
+            <dt>Negative result</dt><dd>SMOTE raised recall but cut PR-AUC from 0.354 to 0.195 — so it was dropped, and that is documented</dd>
+            <dt>Stack</dt><dd>Python · scikit-learn · imbalanced-learn · mlxtend (FP-Growth) · Streamlit · Plotly</dd>
+            <dt>Scale</dt><dd>15,420 claims · 33 attributes · 4 notebooks · 1,096-line Streamlit app</dd>
+            <dt>Role</dt><dd>Group of 2</dd>
+          </dl>
+          <div class="record__foot">
+            <a class="btn btn--solid" href="work/fraud-detection.html">Read the case study</a>
+            <a class="btn" href="https://github.com/Yaserabulaban/insurance-fraud-detection" rel="noopener">Code</a>
+          </div>
+        </div>
+        <div class="record__fig">
+          <img src="assets/img/fraud-threshold.png" width="1188" height="707" loading="lazy"
+               alt="Line chart of fraud-class F1 score against probability threshold for four models, each peaking at a different threshold.">
+        </div>
+      </article>
+
+      <!-- 6 -->
+      <article class="record record--flip">
+        <div class="record__body">
+          <span class="record__tag">Visual information processing · ablation study</span>
+          <h3>Does preprocessing help facial expression recognition?</h3>
+          <p class="record__thesis">A controlled study rather than a leaderboard chase: four data conditions crossed against six model families on FER-2013, holding the test set fixed at 7,178 images. The answer was no — the classical preprocessing pipeline that textbooks recommend made accuracy worse.</p>
+          <dl class="record__facts">
+            <dt>Result</dt><dd>YOLOv11n-cls baseline <strong>65.42%</strong>; adding median + Gaussian + CLAHE preprocessing dropped it to <strong>58.69%</strong></dd>
+            <dt>Better lever</dt><dd>Class-balanced augmentation left accuracy flat but lifted <em>disgust</em> recall from 0.3063 to 0.7207 and macro-F1 to 0.6223</dd>
+            <dt>Stack</dt><dd>Python · Ultralytics YOLO11 · TensorFlow/Keras (VGG19, ResNet50) · scikit-learn (SVM, LR, RF on HOG + SIFT) · OpenCV</dd>
+            <dt>Scale</dt><dd>35,887 images · 4 conditions × 6 model families · 2,356 lines across 7 notebooks</dd>
+            <dt>Role</dt><dd>Group of 3</dd>
+          </dl>
+          <div class="record__foot">
+            <a class="btn btn--solid" href="work/fer-study.html">Read the case study</a>
+            <a class="btn" href="https://github.com/Yaserabulaban/fer-preprocessing-study" rel="noopener">Code</a>
+          </div>
+        </div>
+        <div class="record__fig">
+          <img src="assets/img/fer-confusion-balanced.png" width="1200" height="900" loading="lazy"
+               alt="Normalised confusion matrix for seven facial expression classes after class-balanced augmentation.">
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================ FULL INDEX ============================ -->
+<section class="band" id="index">
+  <div class="wrap">
+    <div class="band__head">
+      <span class="eyebrow">Complete index</span>
+      <h2>Everything else, three years of it</h2>
+      <p class="lede">The rest of the degree, in the order it happened. Systems programming and data structures early on, then software engineering, then machine learning and analysis.</p>
+    </div>
+
+    <div class="tablewrap">
+      <table class="index">
+        <thead>
+          <tr>
+            <th scope="col">Project</th>
+            <th scope="col">Course</th>
+            <th scope="col">Stack</th>
+            <th scope="col">What it measured</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="t">Traditional image enhancement — haze and low light<br><span class="c">Year 3 · solo</span></td>
+            <td class="c">Visual Information Processing</td>
+            <td class="s">OpenCV · numpy · guided filter</td>
+            <td class="m">Colour Attenuation Prior dehazing at 19.02 dB PSNR / 0.817 SSIM; seven-stage low-light pipeline at 17.23 dB / 0.715. No pretrained models</td>
+          </tr>
+          <tr>
+            <td class="t">Enterprise Linux server build<br><span class="c">Year 3 · solo</span></td>
+            <td class="c">System Administration</td>
+            <td class="s">Rocky Linux 9.7 · Apache · Samba · firewalld · SELinux</td>
+            <td class="m">50 accounts across 5 department groups, ACL-based access control, key-only SSH with root login disabled; 8,653 words of documentation, 2% similarity index</td>
+          </tr>
+          <tr>
+            <td class="t">Amazon Prime association rule mining<br><span class="c">Year 3 · group of 4</span></td>
+            <td class="c">Data Mining</td>
+            <td class="s">pandas · mlxtend Apriori · SciPy chi-square</td>
+            <td class="m">Four research questions over 2,530 subscribers, with chi-square independence tests used to check whether the rules meant anything. Mostly they did not — lift sat near 1.0, and the write-up says so</td>
+          </tr>
+          <tr>
+            <td class="t">FoodFinder restaurant directory<br><span class="c">Year 3 · solo, timed lab test</span></td>
+            <td class="c">Web Application Development</td>
+            <td class="s">PHP 8 · MySQL · PDO</td>
+            <td class="m">1,712 lines built under time pressure with prepared statements, CSRF tokens, dual-layer validation and a 10-minute duplicate-review guard</td>
+          </tr>
+          <tr>
+            <td class="t">Malaysian telco plan value analysis<br><span class="c">Year 3 · group of 3</span></td>
+            <td class="c">Data Visualisation</td>
+            <td class="s">Power BI · Excel</td>
+            <td class="m">31 prepaid plans collected by hand from five providers, with advertised &ldquo;unlimited&rdquo; offers normalised to real GB using fair-use caps so cost-per-GB could be compared honestly</td>
+          </tr>
+          <tr>
+            <td class="t">Airbnb property-type classification<br><span class="c">Year 2 · group of 5</span></td>
+            <td class="c">Machine Learning</td>
+            <td class="s">PyTorch · scikit-learn · SMOTE · TF-IDF</td>
+            <td class="m">DNN 0.89 accuracy / 0.91 macro-F1, beating a logistic regression that scored higher accuracy (0.77) but collapsed to 0.16 macro-F1 on 13 imbalanced classes</td>
+          </tr>
+          <tr>
+            <td class="t">Predicting African systemic financial crises<br><span class="c">Year 2 · group of 4</span></td>
+            <td class="c">Data Science Fundamentals</td>
+            <td class="s">pandas · scikit-learn · Random Forest</td>
+            <td class="m">0.99 accuracy at a 0.30 decision threshold, recall 1.00 on 17 crisis cases across 1,059 country-years (1870–2013)</td>
+          </tr>
+          <tr>
+            <td class="t">Statistical data analysis in R<br><span class="c">Year 2 · solo</span></td>
+            <td class="c">Statistical Analysis</td>
+            <td class="s">R · ggplot2 · base stats</td>
+            <td class="m">Pearson r = 0.818 derived by hand from sums of squares; one-sample t-test t = −31.67 (p ≈ 5.7e−153); one-way ANOVA F = 126.4 on a product launch</td>
+          </tr>
+          <tr>
+            <td class="t">Merge sort vs quick sort — empirical study<br><span class="c">Year 2 · group of 4</span></td>
+            <td class="c">Algorithm Design &amp; Analysis</td>
+            <td class="s">Python · Java (data generator)</td>
+            <td class="m">10-point curve from 1,000 to 25,000,000 elements on ~1.4 GB of generated data; quick sort won at every size — 276.9 s vs 341.8 s at 25M</td>
+          </tr>
+          <tr>
+            <td class="t">Kwazam Chess — GUI, MVC, design patterns<br><span class="c">Year 2 · built individually</span></td>
+            <td class="c">Object-Oriented Analysis &amp; Design</td>
+            <td class="s">Java · Swing · AWT</td>
+            <td class="m">2,522 lines across 15 files that I wrote start to finish — model, view and controller under enforced MVC separation, with eight design patterns mapped class by class, plus a 5×8 board whose Tor and Xor pieces swap type every two turns</td>
+          </tr>
+          <tr>
+            <td class="t">Online petrol delivery system<br><span class="c">Year 2 · group of 4</span></td>
+            <td class="c">Software Engineering Fundamentals</td>
+            <td class="s">Django · SQLite · Bootstrap</td>
+            <td class="m">Three-role web app, 8-table schema, 15 migrations, 27 templates, 285 pages of requirements/design/testing documentation. I owned the vendor subsystem and the data dictionary</td>
+          </tr>
+          <tr>
+            <td class="t">CPU scheduling simulator<br><span class="c">Year 2 · group of 4</span></td>
+            <td class="c">Operating Systems</td>
+            <td class="s">Java</td>
+            <td class="m">Round robin, shortest remaining time, shortest job next and non-preemptive priority behind one abstract base class, with rendered Gantt charts and per-process turnaround and waiting times</td>
+          </tr>
+          <tr>
+            <td class="t">Hybrid blockchain consent management for health records<br><span class="c">Year 2 · group of 4</span></td>
+            <td class="c">Research Methods in CS</td>
+            <td class="s">LaTeX · BibTeX · Hyperledger Fabric (proposed)</td>
+            <td class="m">A nine-page research proposal with gap analysis over six peer-reviewed papers, three candidate directions weighed against each other, and a costed methodology</td>
+          </tr>
+          <tr>
+            <td class="t">Robot War simulator<br><span class="c">Year 1 · group of 4</span></td>
+            <td class="c">OOP &amp; Data Structures</td>
+            <td class="s">C++ (no STL containers)</td>
+            <td class="m">2,393 lines, 34 files, four capability mixins composing into seven robot types over virtual inheritance — with a linked list and respawn queue written by hand</td>
+          </tr>
+          <tr>
+            <td class="t">Assembly language interpreter / virtual machine<br><span class="c">Year 1 · group of 4</span></td>
+            <td class="c">Programming Fundamentals</td>
+            <td class="s">C++ standard library only</td>
+            <td class="m">7 registers, 4 status flags, 64 bytes of addressable memory, 18 instructions including rotates, shifts and register-indirect addressing</td>
+          </tr>
+          <tr>
+            <td class="t">Car wash queue simulator<br><span class="c">Year 1 · group of 4</span></td>
+            <td class="c">Computational Methods</td>
+            <td class="s">MATLAB-syntax .m on FreeMat</td>
+            <td class="m">Three-bay discrete-event queue driven by two random number generators written from scratch — a linear congruential generator and a uniform random variate generator</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:1.25rem;">Ordered newest first. Group size is stated for group work and my own contribution named where the report attributed it; every figure comes from the submitted work.</p>
+  </div>
+</section>
+
+<!-- ============================ EXPERIENCE ============================ -->
+<section class="band" id="experience">
+  <div class="wrap">
+    <div class="band__head">
+      <span class="eyebrow">Experience</span>
+      <h2>Three years of it, on two very different problems</h2>
+      <p class="lede">Analytics consultancy for enterprise clients in Saudi Arabia, then a degree, then production backend engineering on a payments and game top-up platform.</p>
+    </div>
+
+    <div class="role">
+      <div class="role__when">
+        <strong>Aug 2025 — present</strong>
+        Internship, converted to full-time<br>
+        Remote
+      </div>
+      <div>
+        <h3>Backend Developer</h3>
+        <p class="role__org">UniPin (Mobile Arts Sdn Bhd) · Malaysia</p>
+        <p>Product and platform engineering on a Kotlin/Spring Boot microservice estate behind a GraphQL gateway, deployed to Kubernetes on Google Cloud. The platform is a game top-up and digital goods gateway, so most of my work sits where our services meet somebody else's.</p>
+        <ul>
+          <li><strong>Integrated 10 third-party game top-up providers</strong> across backend microservices and automation services — inquiry, checkout, delivery and status-check flows — and was top committer on every one of them.</li>
+          <li><strong>Built four TypeScript/Node.js browser-automation services</strong> driving Playwright against partner portals, automating top-up delivery for 8+ game titles across South-East Asian and China-region publishers. Primary author on all four.</li>
+          <li><strong>Engineered the reliability layer those services needed to survive production:</strong> browser fingerprinting and anti-detection, proxy support, CAPTCHA-solving integration, OTP/TOTP two-factor handling, structured JSON logging and screenshot-on-failure capture.</li>
+          <li><strong>Rebuilt a service to meet the platform standard.</strong> My first one was written on Ktor; review feedback was that the estate standardises on Spring Boot. I migrated the whole thing onto Spring Boot and the company template rather than arguing for the exception.</li>
+          <li><strong>Centralised input sanitisation in the shared security library.</strong> I first implemented it inside my own service; review asked for it to live in the shared library so every service inherited it. Refactored into an auto-configured component and merged.</li>
+          <li><strong>Payment channel integration</strong> alongside the game-channel services, plus edge workers on Cloudflare and contributions to the partner-facing OpenAPI documentation site.</li>
+        </ul>
+        <p class="note">Partner names, internal service names and architecture specifics are deliberately left out. Happy to go deeper in conversation on the parts that are mine to discuss.</p>
+      </div>
+    </div>
+
+    <div class="callout" style="margin:2.5rem 0;">
+      <span class="eyebrow">From my supervisor's assessment</span>
+      <p>&ldquo;Yaser showed great enthusiasm and growth during his internship period. His execution on backend tasks was reliable and well-structured, contributing positively to the project's progress. He was open to feedback and demonstrated noticeable improvement in both technical and communication skills. Overall, a solid performance with strong potential for future development in real-world backend projects.&rdquo;</p>
+      <p class="mono" style="font-size:.75rem;color:var(--muted);margin:0;">— DevOps &amp; Backend Lead, UniPin, October 2025</p>
+    </div>
+
+    <div class="role">
+      <div class="role__when">
+        <strong>Sep 2021 — Jul 2023</strong>
+        Intern &rarr; Specialist &rarr; Officer<br>
+        Jeddah, Saudi Arabia
+      </div>
+      <div>
+        <h3>Design &amp; Analysis (DNA) Consultancy</h3>
+        <p class="role__org">Two promotions in under two years</p>
+        <p>Joined as a data science intern and left running projects. The three titles are the story — each one followed the previous, and the second and third were not roles I applied for.</p>
+
+        <h4 class="role__sub">Project Manager Officer · Oct 2022 – Jul 2023</h4>
+        <ul>
+          <li>Managed <strong>15+ consultancy projects independently</strong>, cumulative value above <strong>SAR 5 million</strong>.</li>
+          <li>Raised departmental productivity by roughly <strong>20%</strong> through better coordination and task allocation.</li>
+          <li>Delivered reports and presentations to <strong>12+ clients</strong>, several of whom came back with repeat work.</li>
+        </ul>
+
+        <h4 class="role__sub">Data Scientist Specialist · Jan 2022 – Oct 2022</h4>
+        <ul>
+          <li>Ran analysis on high-profile client engagements, turning findings into strategic recommendations rather than handing over a notebook.</li>
+          <li>Led the review and testing of a digital analytics platform and fed the technical findings back into the product.</li>
+          <li>Coordinated work across departments to hit deadlines on multi-team projects.</li>
+        </ul>
+
+        <h4 class="role__sub">Data Scientist Intern · Sep 2021 – Jan 2022</h4>
+        <ul>
+          <li>Big-data handling and web scraping across client databases.</li>
+          <li>Cross-lingual data work in <strong>Arabic and English</strong>, where mistranslation quietly corrupts an analysis — being bilingual was the qualification.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ SKILLS ============================ -->
+<section class="band" id="skills">
+  <div class="wrap">
+    <div class="band__head">
+      <span class="eyebrow">Toolkit</span>
+      <h2>What I have actually shipped with</h2>
+      <p class="lede">The first six groups are what I work in day to day. &ldquo;Also worked with&rdquo; is everything else that appears in code on this page — real, but not where I would claim depth.</p>
+    </div>
+
+    <div class="skills">
+      <div class="skill">
+        <h3>Languages</h3>
+        <p>TypeScript · Kotlin · Python · C++ · SQL</p>
+      </div>
+      <div class="skill">
+        <h3>Backend &amp; frameworks</h3>
+        <p>Fastify · Express · Spring Boot</p>
+      </div>
+      <div class="skill">
+        <h3>Automation &amp; testing</h3>
+        <p>Playwright browser automation · CAPTCHA-solving integration · OTP / TOTP handling</p>
+      </div>
+      <div class="skill">
+        <h3>APIs &amp; data</h3>
+        <p>REST API design · GraphQL · OpenAPI / Swagger documentation</p>
+      </div>
+      <div class="skill">
+        <h3>Data analysis</h3>
+        <p>Data manipulation · web scraping · reporting</p>
+      </div>
+      <div class="skill">
+        <h3>Databases &amp; tools</h3>
+        <p>MySQL · SQLite · Git / GitHub with a PR-based workflow · Word · Excel · PowerPoint · Power BI</p>
+      </div>
+      <div class="skill">
+        <h3>Also worked with</h3>
+        <p>PyTorch · scikit-learn · Ultralytics YOLO · OpenCV · pandas · D3.js · React · FastAPI · Django · PHP · Java · R</p>
+      </div>
+      <div class="skill">
+        <h3>Soft skills</h3>
+        <p>Teamwork · Leadership · Communication · Adaptability · Time management · Multi-tasking · Learning agility · Creativity · Proactivity · Bilingual</p>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ============================ CREDENTIALS ============================ -->
+<section class="band" id="credentials">
+  <div class="wrap">
+    <div class="band__head">
+      <span class="eyebrow">Credentials</span>
+      <h2>Education, awards, and things outside the code</h2>
+    </div>
+
+    <div class="creds">
+      <div class="cred">
+        <span class="eyebrow">Education &amp; recognition</span>
+        <ul>
+          <li>
+            <strong>BSc (Hons) Computer Science — Data Science</strong>
+            <span>Multimedia University, Cyberjaya · Jul 2023 – Jul 2026 · First Class Honours, CGPA 3.91 / 4.00</span>
+          </li>
+          <li>
+            <strong>Faculty Dean's List — 9 of 9 trimesters</strong>
+            <span>CGPA 3.67 or above every trimester of the degree</span>
+          </li>
+          <li>
+            <strong>Best Student Prodigy 2024</strong>
+            <span>For sustained involvement in student activities while holding a high CGPA</span>
+          </li>
+          <li>
+            <strong>IEEE Computer Society Richard E. Merwin Student Scholarship</strong>
+            <span>Spring 2025 · awarded with a one-year appointment as IEEE Computer Society Student Ambassador</span>
+          </li>
+          <li>
+            <strong>International Merit Scholarship, MMU</strong>
+            <span>For academic performance and leadership involvement</span>
+          </li>
+          <li>
+            <strong>WAMY Scholarship</strong>
+            <span>Awarded for academic achievement</span>
+          </li>
+          <li>
+            <strong>IEEEXtreme 19.0 Ambassador</strong>
+            <span>International 24-hour programming competition</span>
+          </li>
+          <li>
+            <strong>IELTS — overall band 8+</strong>
+          </li>
+        </ul>
+      </div>
+
+      <div class="cred">
+        <span class="eyebrow">Leadership &amp; community</span>
+        <ul>
+          <li>
+            <strong>President &rarr; Advisor, Arabian Cultural Society</strong>
+            <span>MMU · President Sep 2024 – Sep 2025, Advisor Sep 2025 – Jul 2026. Restructured the club and launched a welfare division: <strong>300+ new members</strong>, <strong>12 major events</strong>, <strong>RM 20,000+</strong> raised in sponsorships</span>
+          </li>
+          <li>
+            <strong>Student Ambassador, Student Recruitment Office</strong>
+            <span>MMU · Sep 2023 – Jul 2026 · represented the university at <strong>30+ recruitment fairs</strong>, including Open Day and S.E.E Day 2025</span>
+          </li>
+          <li>
+            <strong>Public Relations Officer, Arabian Cultural Society</strong>
+            <span>Sep 2023 – Aug 2024 · organised 10+ student-led events and secured new sponsorships</span>
+          </li>
+          <li>
+            <strong>Public Relations Officer, IEEE Power &amp; Energy Society Student Branch</strong>
+            <span>MMU · Sep 2023 – Aug 2024 · promoted 8+ official IEEE PES events</span>
+          </li>
+          <li>
+            <strong>Head of Public Relations — Eid Happiness 7 &amp; Ataa 8</strong>
+            <span>Volunteer programmes reaching more than 700 people, funded by sponsorships secured from NGOs, restaurants and individual donors</span>
+          </li>
+          <li>
+            <strong>Languages</strong>
+            <span>Arabic (native) · English (fluent, medium of instruction, IELTS 8+) · French (coursework level)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================ FOOTER ============================ -->
+<footer class="foot" id="contact">
+  <div class="wrap">
+    <span class="eyebrow">Contact</span>
+    <h2 style="margin-bottom:1rem;">Happy to talk about any of this</h2>
+    <p class="foot__intro">If something here is relevant to a role you are filling, or you want the detail behind one of the numbers, email is the fastest route.</p>
+    <p class="foot__where">Jeddah, Saudi Arabia · open to relocation</p>
+    <div class="foot__grid">
+      <ul class="contactlist">
+        <li><a href="mailto:yaserabulaban@gmail.com">yaserabulaban@gmail.com</a></li>
+        <li><a href="tel:+966534679455">+966 53 467 9455</a></li>
+        <li><a href="https://www.linkedin.com/in/yaser-abulaban-82b199236/" rel="noopener">linkedin.com/in/yaser-abulaban</a></li>
+        <li><a href="https://github.com/Yaserabulaban" rel="noopener">github.com/Yaserabulaban</a></li>
+      </ul>
+      <ul class="contactlist">
+        <li><a href="#work">Selected work</a></li>
+        <li><a href="#index">Complete project index</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#skills">Toolkit</a></li>
+        <li><a href="#credentials">Credentials</a></li>
+      </ul>
+    </div>
+    <p class="foot__fine">
+      Static site — no tracking, no analytics. Every figure is output from my own submitted work, and every number traces back to a report, notebook or test run I can produce on request.<br><br>
+      <span class="mono">Built by Yaser Abulaban · Last updated August 2026</span>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
