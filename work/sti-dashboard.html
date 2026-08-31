@@ -8,19 +8,25 @@
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&amp;family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&amp;family=Sono:MONO,wght@1,400..600&amp;display=swap">
 <link rel="stylesheet" href="../assets/css/site.css">
 <script src="../assets/js/site.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
+<svg class="spritesheet" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-github" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></symbol>
+<symbol id="i-linkedin" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5S0 4.881 0 3.5C0 2.12 1.11 1 2.5 1s2.48 1.12 2.48 2.5zM5 8H0v16h5V8zm7.982 0H8.014v16h4.968v-8.399c0-4.67 6.029-5.052 6.029 0V24H24V13.869c0-7.88-8.922-7.593-11.018-3.714V8z"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /><rect x="2" y="4" width="20" height="16" rx="2" /></symbol>
+</defs></svg>
+
 <header class="topbar">
   <a class="topbar__name" href="../">Yaser E. H. Abulaban</a>
   <nav>
+    <a href="../#experience" class="opt">Experience</a>
     <a href="../#work">Work</a>
     <a href="../#index" class="opt">All projects</a>
-    <a href="../#experience" class="opt">Experience</a>
     <a href="../#contact">Contact</a>
     <button class="themetoggle" type="button">Auto</button>
   </nav>
@@ -38,7 +44,7 @@
       <div><dt>Role</dt><dd>Group of 3 — I built the multi-line time series, the animated bubble chart and the dashboard integration</dd></div>
       <div><dt>Data</dt><dd>67,438 records · 31 attributes · 200 countries · 1990–2024</dd></div>
       <div><dt>Stack</dt><dd>D3.js v7, ES modules, vanilla JS, GeoJSON, Python preprocessing</dd></div>
-      <div><dt>Code</dt><dd><a href="https://github.com/Yaserabulaban/sti-trends-dashboard" rel="noopener">github.com/Yaserabulaban/sti-trends-dashboard</a></dd></div>
+      <div><dt>Code</dt><dd><a href="https://github.com/Yaserabulaban/sti-trends-dashboard" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-github"></use></svg>github.com/Yaserabulaban/sti-trends-dashboard</a></dd></div>
     </dl>
   </div>
 </section>
@@ -141,9 +147,9 @@
   <div class="wrap">
     <div class="foot__grid">
       <ul class="contactlist">
-        <li><a href="mailto:yaserabulaban@gmail.com">yaserabulaban@gmail.com</a></li>
-        <li><a href="https://www.linkedin.com/in/yaser-abulaban-82b199236/" rel="noopener">linkedin.com/in/yaser-abulaban</a></li>
-        <li><a href="https://github.com/Yaserabulaban" rel="noopener">github.com/Yaserabulaban</a></li>
+        <li><a href="mailto:yaserabulaban@gmail.com"><svg class="ico" aria-hidden="true"><use href="#i-mail"></use></svg>yaserabulaban@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/yaser-abulaban-82b199236/" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-linkedin"></use></svg>linkedin.com/in/yaser-abulaban</a></li>
+        <li><a href="https://github.com/Yaserabulaban" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-github"></use></svg>github.com/Yaserabulaban</a></li>
       </ul>
     </div>
     <p class="foot__fine">Screenshots from the project's own documentation folder.</p>
