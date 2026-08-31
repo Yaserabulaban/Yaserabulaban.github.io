@@ -11,7 +11,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&amp;display=swap">
 <link rel="stylesheet" href="assets/css/site.css">
 <script src="assets/js/site.js"></script>
 </head>
@@ -63,8 +63,8 @@
           <span>detected: <b>99</b></span>
         </div>
         <img src="assets/img/parkviewrt-detect-day.jpg" width="1600" height="900"
-             alt="Aerial parking-lot frame with 78 slot polygons and 99 detected vehicle boxes drawn over it, each bay coloured by occupancy status.">
-        <figcaption>ParkViewRT debug overlay — one analysed frame, 78 monitored bays, MMU FCI car park.</figcaption>
+             alt="Aerial parking-lot frame with 78 slot polygons and 99 detected vehicle boxes drawn over it, each slot coloured by occupancy status.">
+        <figcaption>ParkViewRT debug overlay — one analysed frame, 78 monitored slots, MMU FCI car park.</figcaption>
       </figure>
     </div>
   </div>
@@ -110,7 +110,7 @@
         <div class="record__body">
           <span class="record__tag">Final year project · computer vision</span>
           <h3>ParkViewRT — vision-based parking occupancy</h3>
-          <p class="record__thesis">A camera replaces a sensor in every bay. YOLO detects vehicles, Shapely maps each detection to one of 197 hand-labelled slot polygons, and a React dashboard shows every bay as occupied, available, occluded or unmonitored — frame by frame, day and night.</p>
+          <p class="record__thesis">A camera replaces a sensor in every slot. YOLO detects vehicles, Shapely maps each detection to one of 197 hand-labelled slot polygons, and a React dashboard shows every slot as occupied, available, occluded or unmonitored — frame by frame, day and night.</p>
           <dl class="record__facts">
             <dt>Result</dt><dd>2,167 / 2,167 verified slot labels correct — 0 false-available, 0 false-occupied, 0 false-occluded</dd>
             <dt>Method</dt><dd>4 YOLO checkpoints benchmarked; 210 threshold combinations grid-searched; ~516 ms per frame</dd>
@@ -125,7 +125,7 @@
         </div>
         <div class="record__fig">
           <img src="assets/img/parkviewrt-ui-fci-day.jpg" width="1500" height="771" loading="lazy"
-               alt="The ParkViewRT dashboard showing the FCI parking layout with rows of bays coloured red, green and amber.">
+               alt="The ParkViewRT dashboard showing the FCI parking layout with rows of slots coloured red, green and amber.">
         </div>
       </article>
 
@@ -205,7 +205,7 @@
         <div class="record__body">
           <span class="record__tag">Data mining · imbalanced classification</span>
           <h3>Insurance fraud: a prediction you can explain</h3>
-          <p class="record__thesis">Fraud is 5.98% of the claims in this dataset, which makes accuracy a liar. So the model is tuned on fraud-class F1 with an explicit decision threshold, and every prediction is paired with human-readable association rules mined from the same data — 285,919 candidates filtered down to 130 that hold up.</p>
+          <p class="record__thesis">Fraud is 5.99% of the claims in this dataset, which makes accuracy a liar. So the model is tuned on fraud-class F1 with an explicit decision threshold, and every prediction is paired with human-readable association rules mined from the same data — 285,919 candidates filtered down to 130 that hold up.</p>
           <dl class="record__facts">
             <dt>Result</dt><dd>Gradient boosting, threshold 0.150: ROC-AUC <strong>0.891</strong>, PR-AUC 0.354, fraud recall 0.486 at precision 0.296</dd>
             <dt>Negative result</dt><dd>SMOTE raised recall but cut PR-AUC from 0.354 to 0.195 — so it was dropped, and that is documented</dd>
@@ -490,7 +490,6 @@
         <p>Teamwork · Leadership · Communication · Adaptability · Time management · Multi-tasking · Learning agility · Creativity · Proactivity · Bilingual</p>
       </div>
     </div>
-  </div>
   </div>
 </section>
 

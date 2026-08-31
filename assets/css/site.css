@@ -137,7 +137,7 @@ ul, ol { max-width: var(--measure); }
 .lede { font-size: 1.2em; line-height: 1.55; color: var(--ink-2); }
 .skip {
   position: absolute; left: -9999px; top: 0; z-index: 99;
-  background: var(--accent); color: #fff; padding: .6rem 1rem;
+  background: var(--accent); color: var(--on-accent); padding: .6rem 1rem;
   font-family: var(--font-mono); font-size: .8rem;
 }
 .skip:focus { left: .5rem; top: .5rem; }
